@@ -1,0 +1,69 @@
+service: customer-document-uploads
+
+provider:
+    name: aws
+    runtime: nodejs12.x
+    memorySize: 256
+    stage: ${opt:stage, 'dev'}
+    region: eu-west-2
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - dynamodb:Query
+          - dynamodb:Scan
+          - dynamodb:GetItem
+          - dynamodb:PutItem
+          - dynamodb:UpdateItem
+        Resource: "*"
+    environment:
+      UPLOADS_TABLE: "${self:service}-${self:provider.stage}-uploads"
+      #jwtsecret: ${ssm:/common/hackney-jwt-secret}
+
+custom:
+    dynamodb:
+        stages:
+        - dev
+        start:
+        port: 8000
+        inMemory: true
+        migrate: true
+    authorizer:
+        authorizer:
+            name: authorizer
+            type: request
+            resultTtlInSeconds: 0
+
+plugins:
+    - serverless-offline
+    - serverless-offline-ssm
+    - serverless-dynamodb-local
+
+functions:
+  root:
+    handler: lambda.root
+    events:
+      - http:
+          path: /
+          method: get
+
+resources:
+    Resources:
+        UploadsDynamoDbTable:
+            Type: 'AWS::DynamoDB::Table'
+            DeletionPolicy: Retain
+            Properties:
+                AttributeDefinitions:
+                -
+                    AttributeName: dropboxId
+                    AttributeType: S
+                KeySchema:
+                -
+                    AttributeName: dropboxId
+                    KeyType: HASH
+                BillingMode: PROVISIONED
+                ProvisionedThroughput:
+                ReadCapacityUnits: 1
+                WriteCapacityUnits: 1
+                StreamSpecification:
+                StreamViewType: NEW_AND_OLD_IMAGES
+                TableName: ${self:provider.environment.UPLOADS_TABLE}

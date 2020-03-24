@@ -1,0 +1,26 @@
+{
+  "name": "customer-document-uploads",
+  "version": "1.0.0",
+  "description": "A simple tool to enable Hackney residents to upload documents for Hackney staff to view",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest",
+    "deploy": "sls deploy --aws-profile docuploads --stage production"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LBHackney-IT/customer-document-uploads.git"
+  },
+  "author": "Ben Pirt and Matthew Millar",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/LBHackney-IT/customer-document-uploads/issues"
+  },
+  "homepage": "https://github.com/LBHackney-IT/customer-document-uploads#readme",
+  "devDependencies": {
+    "serverless": "^1.67.0",
+    "serverless-dynamodb-local": "^0.2.39",
+    "serverless-offline": "^6.0.0",
+    "serverless-offline-ssm": "^4.1.2"
+  }
+}
