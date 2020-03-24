@@ -1,4 +1,5 @@
 const authorize = require('./authorize');
+const templates = loadTemplates(path.join(__dirname, './templates'));
 
 const send = body => {
   return {
@@ -12,7 +13,8 @@ const send = body => {
 
 module.exports = {
   root: async event => {
-    return send('Hello world');
+    const html = templates.rootTemplate({ name: 'Ben' });
+    return send(html);
   },
   authorizer: async event => {
     const result = await authorize(event);
