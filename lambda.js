@@ -1,4 +1,6 @@
 const authorize = require('./authorize');
+const path = require('path');
+const { loadTemplates } = require('./utils');
 const templates = loadTemplates(path.join(__dirname, './templates'));
 
 const send = body => {
