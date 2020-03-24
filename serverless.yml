@@ -17,7 +17,7 @@ provider:
       Resource: "*"
   environment:
     UPLOADS_TABLE: "${self:service}-${self:provider.stage}-uploads"
-    #jwtsecret: ${ssm:/common/hackney-jwt-secret}
+    jwtsecret: ${ssm:/common/hackney-jwt-secret}
 
 custom:
   dynamodb:
@@ -45,6 +45,18 @@ functions:
       - http:
           path: /
           method: get
+  getDropbox:
+    handler: lambda.getDropbox
+    events:
+      - http:
+          path: /dropbox/{id}
+          method: get
+  updateDropbox:
+    handler: lambda.updateDropbox
+    events:
+      - http:
+          path: /dropbox/{id}
+          method: post
 
 resources:
   Resources:
