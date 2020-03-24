@@ -14,15 +14,16 @@ provider:
         - dynamodb:GetItem
         - dynamodb:PutItem
         - dynamodb:UpdateItem
-      Resource: "*"
+      Resource: '*'
   environment:
-    UPLOADS_TABLE: "${self:service}-${self:provider.stage}-uploads"
+    UPLOADS_TABLE: '${self:service}-${self:provider.stage}-uploads'
     jwtsecret: ${ssm:/common/hackney-jwt-secret}
+    stage: ${self:provider.stage}
 
 custom:
   dynamodb:
     stages:
-    - dev
+      - dev
     start:
     port: 8000
     inMemory: true
@@ -59,13 +60,11 @@ resources:
       DeletionPolicy: Retain
       Properties:
         AttributeDefinitions:
-        -
-          AttributeName: dropboxId
-          AttributeType: S
+          - AttributeName: dropboxId
+            AttributeType: S
         KeySchema:
-        -
-          AttributeName: dropboxId
-          KeyType: HASH
+          - AttributeName: dropboxId
+            KeyType: HASH
         BillingMode: PROVISIONED
         ProvisionedThroughput:
           ReadCapacityUnits: 1

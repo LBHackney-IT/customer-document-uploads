@@ -11,42 +11,47 @@ app.get('/dropbox', async (req, res) => {
   let dropboxId;
   const session = getSession(req.headers);
 
-  if(session && session.dropboxId){
+  if (session && session.dropboxId) {
     dropboxId = session.dropboxId;
-  }else{
+  } else {
     dropboxId = generateRandomString(15);
-    res.cookie('customerToken', createSessionToken(dropboxId), {maxAge: (86400 * 30)});
+    res.cookie('customerToken', createSessionToken(dropboxId), {
+      maxAge: 86400 * 30
+    });
   }
-  res.redirect(`dropbox/${dropboxId}`);
+  res.redirect(`/${process.env.stage}/dropbox/${dropboxId}`);
 });
 
 app.get('/dropbox/:id', async (req, res) => {
   const session = getSession(req.headers);
-  if(session && session.dropboxId === req.params.id){
+  if (session && session.dropboxId === req.params.id) {
     // const dropbox = await getDropbox(event.pathParameters.id);
-    const html = templates.userDropboxTemplate({ name: 'Ben' });
+    const html = templates.userDropboxTemplate();
     res.send(html);
-  }else{
-    res.send(400);
+  } else {
+    res.sendStatus(400);
   }
 });
 
 app.post('/dropbox/:id', async (req, res) => {
-  res.redirect(`/dev/dropbox/${req.params.id}`);
+  res.redirect(`/${process.env.stage}/dropbox/${req.params.id}`);
 });
 
-const root = async event => {
-  return {statusCode: 302, headers: {'Location': 'dropbox'}};
-}
+const root = async () => {
+  return {
+    statusCode: 302,
+    headers: { Location: `/${process.env.stage}/dropbox` }
+  };
+};
 
 const authorizer = async event => {
   const result = await authorize(event);
   if (result === 'Unauthorized') throw 'Unauthorized';
   return result;
-}
+};
 
 module.exports = {
   handler: serverless(app),
   authorizer,
   root
-}
+};

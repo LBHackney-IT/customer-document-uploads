@@ -6,7 +6,9 @@
   "scripts": {
     "test": "jest",
     "start": "sls offline start -s dev --noAuth",
-    "deploy": "sls deploy --aws-profile docuploads --stage production"
+    "deploy": "sls deploy --aws-profile docuploads --stage production",
+    "debug": "export SLS_DEBUG=* && node --inspect ./node_modules/serverless/bin/serverless offline -s dev --noAuth",
+    "lint": "eslint --fix --ext js ./*.js && echo 'Lint complete.'"
   },
   "repository": {
     "type": "git",
@@ -19,9 +21,13 @@
   },
   "homepage": "https://github.com/LBHackney-IT/customer-document-uploads#readme",
   "devDependencies": {
+    "eslint": "^6.6.0",
+    "eslint-config-prettier": "^6.5.0",
+    "eslint-plugin-prettier": "^3.1.1",
+    "prettier": "^1.18.2",
     "serverless": "^1.67.0",
     "serverless-dynamodb-local": "^0.2.39",
-    "serverless-offline": "^6.0.0",
+    "serverless-offline": "^6.1.0",
     "serverless-offline-ssm": "^4.1.2"
   },
   "dependencies": {
