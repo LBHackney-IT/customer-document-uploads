@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "jest",
+    "start": "sls offline start -s dev --noAuth",
     "deploy": "sls deploy --aws-profile docuploads --stage production"
   },
   "repository": {
@@ -22,5 +23,8 @@
     "serverless-dynamodb-local": "^0.2.39",
     "serverless-offline": "^6.0.0",
     "serverless-offline-ssm": "^4.1.2"
+  },
+  "dependencies": {
+    "jsonwebtoken": "^8.5.1"
   }
 }
