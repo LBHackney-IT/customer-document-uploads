@@ -43,20 +43,14 @@ functions:
     handler: lambda.root
     events:
       - http:
-          path: /
-          method: get
-  getDropbox:
-    handler: lambda.getDropbox
+          path: '/'
+          method: GET
+  main:
+    handler: lambda.handler
     events:
       - http:
-          path: /dropbox/{id}
-          method: get
-  updateDropbox:
-    handler: lambda.updateDropbox
-    events:
-      - http:
-          path: /dropbox/{id}
-          method: post
+          path: '{proxy+}'
+          method: ANY
 
 resources:
   Resources:

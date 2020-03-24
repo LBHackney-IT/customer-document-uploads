@@ -1,3 +1,19 @@
-<p>
-  Hello {{name}}
-</p>
+{{> header }}
+
+<p>Welcome to Hackney Document Upload.</p>
+<p>Your secure way to send your documents to Hackney Council.</p>
+
+<form action="" method="POST">
+  <div>
+    <label for="customerName">Your Name:</label>
+    <input type="text" name="customerName">
+  </div>
+  <div>
+    <input type="file" name="upload">
+    <label for="customerName">File Name:</label>
+    <input type ="text" name="fileName">
+    <input type="submit" value="Upload file">
+  </div>
+</form>
+
+{{> footer }}
