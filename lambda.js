@@ -35,7 +35,7 @@ app.get('/dropbox/:id', async (req, res) => {
     const html = templates.userDropboxTemplate({ dropbox });
     res.send(html);
   } else {
-    res.sendStatus(400);
+    res.redirect(`/${process.env.stage}/dropbox`);
   }
 });
 
