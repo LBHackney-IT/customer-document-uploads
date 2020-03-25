@@ -25,9 +25,9 @@ custom:
     stages:
       - dev
     start:
-    port: 8000
-    inMemory: true
-    migrate: true
+      port: 8000
+      inMemory: true
+      migrate: true
   authorizer:
     authorizer:
       name: authorizer

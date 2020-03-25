@@ -3,7 +3,7 @@ const path = require('path');
 const { loadTemplates, generateRandomString } = require('./lib/utils');
 const { getSession, createSessionToken } = require('./lib/sessions');
 const templates = loadTemplates(path.join(__dirname, './templates'));
-const { saveDropbox } = require('./lib/Dependencies');
+const { getDropbox, saveDropbox } = require('./lib/Dependencies');
 const serverless = require('serverless-http');
 const express = require('express');
 const bodyParser = require('body-parser');
@@ -31,8 +31,8 @@ app.get('/dropbox', async (req, res) => {
 app.get('/dropbox/:id', async (req, res) => {
   const session = getSession(req.headers);
   if (session && session.dropboxId === req.params.id) {
-    // const dropbox = await getDropbox(event.pathParameters.id);
-    const html = templates.userDropboxTemplate();
+    const dropbox = await getDropbox(req.params.id);
+    const html = templates.userDropboxTemplate({ dropbox });
     res.send(html);
   } else {
     res.sendStatus(400);
