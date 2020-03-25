@@ -17,6 +17,7 @@ provider:
       Resource: '*'
   environment:
     DROPBOXES_TABLE: '${self:service}-${self:provider.stage}-dropboxes'
+    UPLOADS_BUCKET: '${self:service}-${self:provider.stage}-uploads'
     jwtsecret: ${ssm:/common/hackney-jwt-secret}
     stage: ${self:provider.stage}
 
@@ -28,16 +29,17 @@ custom:
       port: 8000
       inMemory: true
       migrate: true
-  authorizer:
-    authorizer:
-      name: authorizer
-      type: request
-      resultTtlInSeconds: 0
+  s3:
+    port: 8100
+    directory: ./.s3local
+    host: localhost
+    address: localhost
 
 plugins:
   - serverless-offline
   - serverless-offline-ssm
   - serverless-dynamodb-local
+  - serverless-s3-local
 
 functions:
   root:
@@ -55,6 +57,10 @@ functions:
 
 resources:
   Resources:
+    UploadsBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: ${self:provider.environment.UPLOADS_BUCKET}
     UploadsDynamoDbTable:
       Type: 'AWS::DynamoDB::Table'
       DeletionPolicy: Retain
