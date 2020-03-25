@@ -9,7 +9,7 @@
 <h3>Files:</h3>
 <ul>
   {{#each dropbox.uploads }}
-    <li><a href="">{{this.title}} - {{this.fileName}}</a></li>
+    <li><a href="/dropboxes/{{../dropboxId}}/file/{{@key}}" target="_blank">{{this.title}} - {{this.fileName}}</a></li>
   {{/each}}
 </ul>
 
