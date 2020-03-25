@@ -9,10 +9,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const formidableMiddleware = require('express-formidable');
 const app = express();
-const globals = {
-  staffLoginUrl: `/dropboxes/`,
-  stage: process.env.stage
-};
+const urlPrefix = process.env.stage === 'dev' ? '' : `/${process.env.stage}`;
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(formidableMiddleware());
@@ -25,16 +22,16 @@ app.get('/login', async (req, res) => {
 app.get('/dropboxes', async (req, res) => {
   if (authorize(req)) {
     const dropboxes = await getDropboxes();
-    const html = templates.staffDropboxListTemplate({ dropboxes, globals });
+    const html = templates.staffDropboxListTemplate({ dropboxes, urlPrefix });
     res.send(html);
   } else {
-    res.redirect(`/login`);
+    res.redirect(`${urlPrefix}/login`);
   }
 });
 
 app.get('/dropboxes/new', async (req, res) => {
   if (authorize(req)) {
-    res.redirect(`/dropboxes`);
+    res.redirect(`${urlPrefix}/dropboxes`);
   } else {
     let dropboxId;
     const session = getSession(req.headers);
@@ -48,7 +45,7 @@ app.get('/dropboxes/new', async (req, res) => {
         maxAge: 86400 * 30
       });
     }
-    res.redirect(`/dropboxes/${dropboxId}`);
+    res.redirect(`${urlPrefix}/dropboxes/${dropboxId}`);
   }
 });
 
@@ -56,26 +53,25 @@ app.get('/dropboxes/:id', async (req, res) => {
   const session = getSession(req.headers);
   if (session && session.dropboxId === req.params.id) {
     const dropbox = await getDropbox(req.params.id);
-    const html = templates.userDropboxTemplate({ dropbox, globals, dropboxId: req.params.id });
+    const html = templates.userDropboxTemplate({ dropbox, urlPrefix, dropboxId: req.params.id });
     res.send(html);
   } else {
-    res.redirect(`/dropboxes/new`);
+    res.redirect(`${urlPrefix}/dropboxes/new`);
   }
 });
 
 app.get('/dropboxes/:id/view', async (req, res) => {
   if (authorize(req)) {
     const dropbox = await getDropbox(req.params.id);
-    const html = templates.staffDropboxTemplate({ dropbox, globals, dropboxId: req.params.id });
+    const html = templates.staffDropboxTemplate({ dropbox, urlPrefix, dropboxId: req.params.id });
     res.send(html);
   } else {
-    res.redirect(`/login`);
+    res.redirect(`${urlPrefix}/login`);
   }
 });
 
 app.get('/dropboxes/:dropboxId/file/:fileId', async (req, res) => {
   const dropbox = await getDropbox(req.params.dropboxId)
-  console.log(dropbox)
   const file = dropbox.uploads[req.params.fileId];
   if(file){
     const signedUrl = await getDownloadUrl(req.params.dropboxId, req.params.fileId, file.fileName)
@@ -87,13 +83,13 @@ app.get('/dropboxes/:dropboxId/file/:fileId', async (req, res) => {
 
 app.post('/dropboxes/:id', async (req, res) => {
   await saveDropbox(req.params.id, req.fields, req.files.newUploadFile);
-  res.redirect(`/dropboxes/${req.params.id}`);
+  res.redirect(`${urlPrefix}/dropboxes/${req.params.id}`);
 });
 
 const root = async () => {
   return {
     statusCode: 302,
-    headers: { Location: `/dropboxes/new` }
+    headers: { Location: `${urlPrefix}/dropboxes/new` }
   };
 };
 
