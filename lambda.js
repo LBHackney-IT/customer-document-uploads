@@ -19,7 +19,6 @@ app.use(formidableMiddleware());
 
 app.get('/login', async (req, res) => {
   const html = templates.loginTemplate({ globals });
-  console.log(res)
   res.send(html);
 });
 
