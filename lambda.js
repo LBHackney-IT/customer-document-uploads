@@ -84,12 +84,6 @@ const root = async () => {
   };
 };
 
-const authorizer = async event => {
-  const result = await authorize(event);
-  if (result === 'Unauthorized') throw 'Unauthorized';
-  return result;
-};
-
 module.exports = {
   handler: serverless(app),
   root
