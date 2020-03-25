@@ -1,0 +1,16 @@
+{{> header }}
+
+<h3>Customer Name:</h3>
+<p>{{ dropbox.customerName }}</p>
+
+<h3>description:</h3>
+{{ dropbox.description }}
+
+<h3>Files:</h3>
+<ul>
+  {{#each dropbox.files }}
+    <li><a href="">{{this.name}}</a></li>
+  {{/each}}
+</ul>
+
+{{> footer }}

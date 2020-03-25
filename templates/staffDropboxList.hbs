@@ -1,0 +1,12 @@
+{{> header }}
+
+<a href="/dropboxes/"><< Back to all dropboxes</a>
+
+<h3>Dropboxes</h3>
+<ul>
+  {{#each dropboxes}}
+    <li><a href="/dropboxes/{{this.dropboxId}}/view">{{this.customerName}}</a></li>
+  {{/each}}
+</ul>
+
+{{> footer }}
