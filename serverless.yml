@@ -16,7 +16,7 @@ provider:
         - dynamodb:UpdateItem
       Resource: '*'
   environment:
-    UPLOADS_TABLE: '${self:service}-${self:provider.stage}-uploads'
+    DROPBOXES_TABLE: '${self:service}-${self:provider.stage}-dropboxes'
     jwtsecret: ${ssm:/common/hackney-jwt-secret}
     stage: ${self:provider.stage}
 
@@ -71,4 +71,4 @@ resources:
           WriteCapacityUnits: 1
         StreamSpecification:
           StreamViewType: NEW_AND_OLD_IMAGES
-        TableName: ${self:provider.environment.UPLOADS_TABLE}
+        TableName: ${self:provider.environment.DROPBOXES_TABLE}

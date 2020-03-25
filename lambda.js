@@ -3,9 +3,15 @@ const path = require('path');
 const { loadTemplates, generateRandomString } = require('./lib/utils');
 const { getSession, createSessionToken } = require('./lib/sessions');
 const templates = loadTemplates(path.join(__dirname, './templates'));
+const { saveDropbox } = require('./lib/Dependencies');
 const serverless = require('serverless-http');
 const express = require('express');
+const bodyParser = require('body-parser');
+const formidableMiddleware = require('express-formidable');
 const app = express();
+
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(formidableMiddleware());
 
 app.get('/dropbox', async (req, res) => {
   let dropboxId;
@@ -34,6 +40,7 @@ app.get('/dropbox/:id', async (req, res) => {
 });
 
 app.post('/dropbox/:id', async (req, res) => {
+  await saveDropbox(req.params.id, req.fields, req.files.upload);
   res.redirect(`/${process.env.stage}/dropbox/${req.params.id}`);
 });
 
