@@ -9,16 +9,20 @@
   {{/each}}
 </ul>
 <form action="" method="POST" encType="multipart/form-data">
-  <div>
-    <label for="customerName">Your Name:</label>
+  <div class="form-row">
+    <label for="customerName">Your name:</label>
     <input type="text" name="customerName" value={{ dropbox.customerName }}>
+  </div>
+  <div class="form-row">
+    <label for="description">What is this document for?:</label>
     <textarea name="description">{{ dropbox.description }}</textarea>
   </div>
-  <div>
-    <input type="file" name="newUploadFile">
-    <label for="customerName">File Name:</label>
-    <input type ="text" name="newUploadTitle">
-    <input type="submit" value="Upload file">
+  <div class="form-row">
+    <label for='customerName'>Select file:</label>
+    <input type='file' name='newUploadFile' />
+  </div>
+  <div class="form-row">
+    <button type='submit'> Upload file</button>
   </div>
 </form>
 

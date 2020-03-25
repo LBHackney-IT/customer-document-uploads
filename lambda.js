@@ -12,7 +12,7 @@ const app = express();
 const globals = {
   staffLoginUrl: `/dropboxes/`,
   stage: process.env.stage
-}
+};
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(formidableMiddleware());
@@ -23,19 +23,19 @@ app.get('/login', async (req, res) => {
 });
 
 app.get('/dropboxes', async (req, res) => {
-  if(authorize(req)){
+  if (authorize(req)) {
     const dropboxes = await getDropboxes();
     const html = templates.staffDropboxListTemplate({ dropboxes, globals });
     res.send(html);
-  }else{
-    res.redirect(`/login`)
+  } else {
+    res.redirect(`/login`);
   }
 });
 
 app.get('/dropboxes/new', async (req, res) => {
-  if(authorize(req)){
-    res.redirect(`/dropboxes`)
-  }else{
+  if (authorize(req)) {
+    res.redirect(`/dropboxes`);
+  } else {
     let dropboxId;
     const session = getSession(req.headers);
 
@@ -64,12 +64,12 @@ app.get('/dropboxes/:id', async (req, res) => {
 });
 
 app.get('/dropboxes/:id/view', async (req, res) => {
-  if(authorize(req)){
+  if (authorize(req)) {
     const dropbox = await getDropbox(req.params.id);
     const html = templates.staffDropboxTemplate({ dropbox, globals });
     res.send(html);
-  }else{
-    res.redirect(`/login`)
+  } else {
+    res.redirect(`/login`);
   }
 });
 
