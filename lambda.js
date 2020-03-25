@@ -15,7 +15,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(formidableMiddleware());
 
 app.get('/login', async (req, res) => {
-  const html = templates.loginTemplate({ globals });
+  const html = templates.loginTemplate({ urlPrefix });
   res.send(html);
 });
 
