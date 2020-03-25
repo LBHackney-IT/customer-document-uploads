@@ -3,7 +3,7 @@ const path = require('path');
 const { loadTemplates, generateRandomString } = require('./lib/utils');
 const { getSession, createSessionToken } = require('./lib/sessions');
 const templates = loadTemplates(path.join(__dirname, './templates'));
-const { getDropbox, saveDropbox, getDropboxes } = require('./lib/Dependencies');
+const { getDropbox, saveDropbox, getDropboxes, createEmptyDropbox } = require('./lib/Dependencies');
 const serverless = require('serverless-http');
 const express = require('express');
 const bodyParser = require('body-parser');
@@ -43,6 +43,7 @@ app.get('/dropboxes/new', async (req, res) => {
       dropboxId = session.dropboxId;
     } else {
       dropboxId = generateRandomString(15);
+      await createEmptyDropbox(dropboxId);
       res.cookie('customerToken', createSessionToken(dropboxId), {
         maxAge: 86400 * 30
       });
@@ -73,7 +74,7 @@ app.get('/dropboxes/:id/view', async (req, res) => {
 });
 
 app.post('/dropboxes/:id', async (req, res) => {
-  await saveDropbox(req.params.id, req.fields, req.files.upload);
+  await saveDropbox(req.params.id, req.fields, req.files.newUploadFile);
   res.redirect(`/dropboxes/${req.params.id}`);
 });
 

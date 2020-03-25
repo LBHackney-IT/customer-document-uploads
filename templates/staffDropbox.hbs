@@ -8,8 +8,8 @@
 
 <h3>Files:</h3>
 <ul>
-  {{#each dropbox.files }}
-    <li><a href="">{{this.name}}</a></li>
+  {{#each dropbox.uploads }}
+    <li><a href="">{{this.title}} - {{this.fileName}}</a></li>
   {{/each}}
 </ul>
 

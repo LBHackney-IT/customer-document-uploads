@@ -2,7 +2,12 @@
 
 <p>Welcome to Hackney Document Upload.</p>
 <p>Your secure way to send your documents to Hackney Council.</p>
-
+<h3>Files:</h3>
+<ul>
+  {{#each dropbox.uploads }}
+    <li><a href="">{{this.title}} - {{this.fileName}}</a></li>
+  {{/each}}
+</ul>
 <form action="" method="POST" encType="multipart/form-data">
   <div>
     <label for="customerName">Your Name:</label>
