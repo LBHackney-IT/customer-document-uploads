@@ -59,6 +59,8 @@ app.get('/dropboxes/:id', async (req, res) => {
   const session = getSession(req.headers);
   if (session && session.dropboxId === req.params.id) {
     const dropbox = await getDropbox(req.params.id);
+    dropbox.hasUplaods = Object.keys(dropbox.uploads).length > 0;
+    console.log(dropbox)
     const html = templates.userDropboxTemplate({
       dropbox,
       pathPrefix,

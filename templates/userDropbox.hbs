@@ -1,21 +1,16 @@
 {{> header }}
 <p>Your secure way to send your documents to Hackney Council.</p>
 <section>
-  <h2>Upload Documents:</h2>
-  <ol>
-    <li>Upload as many documents as you need to, one at a time.</li>
-    <li>Go to the customer details sction below.</li>
-  </ol>
-  {{#if dropbox.uploads }}
-    <h3>Uploaded Documents:</h3>
+  <h2>1. Upload your documents</h2>
+  <p>Upload as many documents as you need to, one at a time. Give them a description so it's clear which one is which.</p>
+  {{#if dropbox.hasUploads }}
+    <h3>Your uploaded Documents:</h3>
   {{/if }}
   <ol>
     {{#each dropbox.uploads }}
       <li>
-        <a href="{{../pathPrefix}}/dropboxes/{{../dropboxId}}/file/{{@key}}" target="_blank">
-          {{#if this.title }}{{this.title}} - {{/if }}{{this.fileName}}
-        </a>
-        &nbsp;
+        <a href="{{../pathPrefix}}/dropboxes/{{../dropboxId}}/file/{{@key}}" target="_blank">{{this.fileName}}</a>
+        {{#if this.title }} - {{this.title}}{{/if }}
         <form method="POST" action="{{ ../pathPrefix }}/dropboxes/{{ ../dropboxId }}/documents/{{ @key }}" onSubmit="javascript: return confirm('Are you sure you want to delete this document?');">
           <input type="hidden" name="_method" value="DELETE" />
           <button>Delete document</button>
@@ -38,11 +33,8 @@
   </form>
 </section>
 <section>
-  <h2>Customer Details:</h2>
-  <ol>
-    <li>Enter your name and tell us what the documents are for</li>
-    <li>Click "Submit Documents" to send the documents to us</li>
-  </ol>
+  <h2>2. Add your details:</h2>
+  <p>Enter your name and tell us what the documents are for. Click "Submit Documents" to send the documents to us</p>
   <form action="" method="POST">
     <div class="form-row">
       <label for="customerName">Your name:</label>
