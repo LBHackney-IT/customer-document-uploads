@@ -27,7 +27,7 @@ app.get('/login', async (req, res) => {
 
 app.get('/dropboxes', async (req, res) => {
   if (authorize(req)) {
-    const dropboxes = await getDropboxes();
+    const dropboxes = await getDropboxes({submitted: true});
     const html = templates.staffDropboxListTemplate({ dropboxes, pathPrefix });
     res.send(html);
   } else {
