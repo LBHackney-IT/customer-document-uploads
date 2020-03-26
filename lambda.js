@@ -3,7 +3,13 @@ const path = require('path');
 const { loadTemplates, generateRandomString } = require('./lib/utils');
 const { getSession, createSessionToken } = require('./lib/sessions');
 const templates = loadTemplates(path.join(__dirname, './templates'));
-const { getDropbox, saveDropbox, getDropboxes, createEmptyDropbox, getDownloadUrl } = require('./lib/Dependencies');
+const {
+  getDropbox,
+  saveDropbox,
+  getDropboxes,
+  createEmptyDropbox,
+  getDownloadUrl
+} = require('./lib/Dependencies');
 const serverless = require('serverless-http');
 const express = require('express');
 const bodyParser = require('body-parser');
@@ -54,7 +60,11 @@ app.get('/dropboxes/:id', async (req, res) => {
   const session = getSession(req.headers);
   if (session && session.dropboxId === req.params.id) {
     const dropbox = await getDropbox(req.params.id);
-    const html = templates.userDropboxTemplate({ dropbox, urlPrefix, dropboxId: req.params.id });
+    const html = templates.userDropboxTemplate({
+      dropbox,
+      urlPrefix,
+      dropboxId: req.params.id
+    });
     res.send(html);
   } else {
     res.redirect(`${urlPrefix}/dropboxes/new`);
@@ -64,7 +74,11 @@ app.get('/dropboxes/:id', async (req, res) => {
 app.get('/dropboxes/:id/view', async (req, res) => {
   if (authorize(req)) {
     const dropbox = await getDropbox(req.params.id);
-    const html = templates.staffDropboxTemplate({ dropbox, urlPrefix, dropboxId: req.params.id });
+    const html = templates.staffDropboxTemplate({
+      dropbox,
+      urlPrefix,
+      dropboxId: req.params.id
+    });
     res.send(html);
   } else {
     res.redirect(`${urlPrefix}/login`);
@@ -72,15 +86,19 @@ app.get('/dropboxes/:id/view', async (req, res) => {
 });
 
 app.get('/dropboxes/:dropboxId/file/:fileId', async (req, res) => {
-  const dropbox = await getDropbox(req.params.dropboxId)
+  const dropbox = await getDropbox(req.params.dropboxId);
   const file = dropbox.uploads[req.params.fileId];
-  if(file){
-    const signedUrl = await getDownloadUrl(req.params.dropboxId, req.params.fileId, file.fileName)
-    res.redirect(signedUrl)
-  }else{
-    res.send(404)
+  if (file) {
+    const signedUrl = await getDownloadUrl(
+      req.params.dropboxId,
+      req.params.fileId,
+      file.fileName
+    );
+    res.redirect(signedUrl);
+  } else {
+    res.send(404);
   }
-})
+});
 
 app.post('/dropboxes/:id', async (req, res) => {
   await saveDropbox(req.params.id, req.fields, req.files.newUploadFile);

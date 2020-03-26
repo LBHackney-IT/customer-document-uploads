@@ -1,11 +1,11 @@
 {{> header }}
-
 <p>Welcome to Hackney Document Upload.</p>
 <p>Your secure way to send your documents to Hackney Council.</p>
 <h3>Files:</h3>
 <ul>
   {{#each dropbox.uploads }}
-    <li><a href="{{../urlPrefix}}/dropboxes/{{../dropboxId}}/file/{{@key}}" target="_blank">{{this.title}} - {{this.fileName}}</a></li>
+    <li><a href="{{../urlPrefix}}/dropboxes/{{../dropboxId}}/file/{{@key}}" target="_blank">{{this.title}} -
+        {{this.fileName}}</a></li>
   {{/each}}
 </ul>
 <form action="" method="POST" encType="multipart/form-data">
@@ -18,16 +18,15 @@
     <textarea name="description">{{ dropbox.description }}</textarea>
   </div>
   <div class="form-row">
-    <label for='newUploadFile'>Select file:</label>
-    <input type='file' name='newUploadFile' />
+    <label for="newUploadFile">Select file:</label>
+    <input type="file" name="newUploadFile" />
   </div>
   <div class="form-row">
-    <label for='newUploadTitle'>File description (optional):</label>
-    <input type='text' name='newUploadTitle' />
+    <label for="newUploadTitle">File description (optional):</label>
+    <input type="text" name="newUploadTitle" />
   </div>
   <div class="form-row">
-    <button type='submit'> Upload file</button>
+    <button type="submit"> Upload file</button>
   </div>
 </form>
-
 {{> footer }}
