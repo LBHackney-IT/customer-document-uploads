@@ -95,3 +95,13 @@ resources:
         StreamSpecification:
           StreamViewType: NEW_AND_OLD_IMAGES
         TableName: ${self:provider.environment.DROPBOXES_TABLE}
+
+package:
+  exclude:
+    - '.circleci/**'
+    - '.dynamodb/**'
+    - '.s3local/**'
+    - '.serverless/**'
+    - '.vscode/**'
+    - '.circleci/**'
+    - 'README.md'
