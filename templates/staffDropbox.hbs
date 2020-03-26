@@ -7,7 +7,7 @@
 <ul>
   {{#each dropbox.uploads }}
     <li>
-      <a href="{{../urlPrefix}}/dropboxes/{{../dropboxId}}/file/{{@key}}" target="_blank">{{this.title}} -
+      <a href="{{../pathPrefix}}/dropboxes/{{../dropboxId}}/file/{{@key}}" target="_blank">{{this.title}} -
         {{this.fileName}}</a>
     </li>
   {{/each}}

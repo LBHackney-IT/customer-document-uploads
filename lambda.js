@@ -15,30 +15,30 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const formidableMiddleware = require('express-formidable');
 const app = express();
-const urlPrefix = process.env.stage === 'dev' ? '' : `/${process.env.stage}`;
+const pathPrefix = process.env.stage === 'dev' ? '' : `/${process.env.stage}`;
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(formidableMiddleware());
 app.use(express.static(__dirname + '/static'));
 
 app.get('/login', async (req, res) => {
-  const html = templates.loginTemplate({ urlPrefix });
+  const html = templates.loginTemplate({ pathPrefix });
   res.send(html);
 });
 
 app.get('/dropboxes', async (req, res) => {
   if (authorize(req)) {
     const dropboxes = await getDropboxes();
-    const html = templates.staffDropboxListTemplate({ dropboxes, urlPrefix });
+    const html = templates.staffDropboxListTemplate({ dropboxes, pathPrefix });
     res.send(html);
   } else {
-    res.redirect(`${urlPrefix}/login`);
+    res.redirect(`${pathPrefix}/login`);
   }
 });
 
 app.get('/dropboxes/new', async (req, res) => {
   if (authorize(req)) {
-    res.redirect(`${urlPrefix}/dropboxes`);
+    res.redirect(`${pathPrefix}/dropboxes`);
   } else {
     let dropboxId;
     const session = getSession(req.headers);
@@ -52,7 +52,7 @@ app.get('/dropboxes/new', async (req, res) => {
         maxAge: 86400 * 30
       });
     }
-    res.redirect(`${urlPrefix}/dropboxes/${dropboxId}`);
+    res.redirect(`${pathPrefix}/dropboxes/${dropboxId}`);
   }
 });
 
@@ -62,12 +62,12 @@ app.get('/dropboxes/:id', async (req, res) => {
     const dropbox = await getDropbox(req.params.id);
     const html = templates.userDropboxTemplate({
       dropbox,
-      urlPrefix,
+      pathPrefix,
       dropboxId: req.params.id
     });
     res.send(html);
   } else {
-    res.redirect(`${urlPrefix}/dropboxes/new`);
+    res.redirect(`${pathPrefix}/dropboxes/new`);
   }
 });
 
@@ -76,12 +76,12 @@ app.get('/dropboxes/:id/view', async (req, res) => {
     const dropbox = await getDropbox(req.params.id);
     const html = templates.staffDropboxTemplate({
       dropbox,
-      urlPrefix,
+      pathPrefix,
       dropboxId: req.params.id
     });
     res.send(html);
   } else {
-    res.redirect(`${urlPrefix}/login`);
+    res.redirect(`${pathPrefix}/login`);
   }
 });
 
@@ -108,7 +108,7 @@ app.post('/dropboxes/:id', async (req, res) => {
 const root = async () => {
   return {
     statusCode: 302,
-    headers: { Location: `${urlPrefix}/dropboxes/new` }
+    headers: { Location: `${pathPrefix}/dropboxes/new` }
   };
 };
 

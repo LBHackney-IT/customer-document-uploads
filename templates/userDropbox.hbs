@@ -4,14 +4,14 @@
 <h3>Files:</h3>
 <ul>
   {{#each dropbox.uploads }}
-    <li><a href="{{../urlPrefix}}/dropboxes/{{../dropboxId}}/file/{{@key}}" target="_blank">{{this.title}} -
+    <li><a href="{{../pathPrefix}}/dropboxes/{{../dropboxId}}/file/{{@key}}" target="_blank">{{this.title}} -
         {{this.fileName}}</a></li>
   {{/each}}
 </ul>
 <form action="" method="POST" encType="multipart/form-data">
   <div class="form-row">
     <label for="customerName">Your name:</label>
-    <input type="text" name="customerName" value={{ dropbox.customerName }}>
+    <input type="text" name="customerName" value="{{ dropbox.customerName }}">
   </div>
   <div class="form-row">
     <label for="description">What are these documents for?:</label>
