@@ -17,6 +17,15 @@ header svg {
   color: white;
 }
 
+footer{
+  padding: 50px 25px;
+  background-color: black;
+}
+
+footer a{
+  color: #FFF;
+}
+
 .container {
   padding: 25px;
 }

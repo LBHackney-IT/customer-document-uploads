@@ -59,13 +59,15 @@ app.get('/dropboxes/:id', async (req, res) => {
   const session = getSession(req.headers);
   if (session && session.dropboxId === req.params.id) {
     const dropbox = await getDropbox(req.params.id);
-    dropbox.hasUplaods = Object.keys(dropbox.uploads).length > 0;
-    console.log(dropbox)
-    const html = templates.userDropboxTemplate({
+    dropbox.hasUploads = Object.keys(dropbox.uploads).length > 0;
+    const params = {
       dropbox,
       pathPrefix,
       dropboxId: req.params.id
-    });
+    }
+    const html = dropbox.submitted
+      ? templates.readonlyDropboxTemplate(params)
+      : templates.createDropboxTemplate(params);
     res.send(html);
   } else {
     res.redirect(`${pathPrefix}/dropboxes/new`);
@@ -75,10 +77,12 @@ app.get('/dropboxes/:id', async (req, res) => {
 app.get('/dropboxes/:id/view', async (req, res) => {
   if (authorize(req)) {
     const dropbox = await getDropbox(req.params.id);
-    const html = templates.staffDropboxTemplate({
+    dropbox.hasUploads = Object.keys(dropbox.uploads).length > 0;
+    const html = templates.readonlyDropboxTemplate({
       dropbox,
       pathPrefix,
-      dropboxId: req.params.id
+      dropboxId: req.params.id,
+      isStaff: true
     });
     res.send(html);
   } else {
