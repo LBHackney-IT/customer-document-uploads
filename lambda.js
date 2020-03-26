@@ -1,5 +1,6 @@
 const authorize = require('./lib/authorize');
 const path = require('path');
+const querystring = require('querystring');
 const { loadTemplates, generateRandomString } = require('./lib/utils');
 const { getSession, createSessionToken } = require('./lib/sessions');
 const templates = loadTemplates(path.join(__dirname, './templates'));
@@ -99,16 +100,22 @@ app.get('/dropboxes/:dropboxId/file/:fileId', async (req, res) => {
   }
 });
 
-const saveDropboxHandler = async (event) => {
-  if(event.isBase64Encoded) event.body = Buffer.from(event.body, 'base64').toString('binary')
-  const formData = multipart.parse(event);
+const saveDropboxHandler = async event => {
+  let formData;
+  if (event.isBase64Encoded) {
+    event.body = Buffer.from(event.body, 'base64').toString('binary');
+    formData = multipart.parse(event);
+  } else {
+    formData = querystring.parse(event.body);
+  }
+
   await saveDropbox(event.pathParameters.id, formData);
 
   return {
     statusCode: 302,
     headers: { Location: `${pathPrefix}/dropboxes/${event.pathParameters.id}` }
   };
-}
+};
 
 const deleteDocumentHandler = async (event) => {
   if(event.isBase64Encoded) event.body = Buffer.from(event.body, 'base64').toString('binary')
