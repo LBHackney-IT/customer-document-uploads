@@ -17,7 +17,6 @@ const express = require('express');
 const multipart = require('aws-lambda-multipart-parser');
 const app = express();
 const pathPrefix = '';
-const { parse } = require('querystring')
 
 app.use(express.static(__dirname + '/static'));
 
@@ -102,14 +101,14 @@ app.get('/dropboxes/:dropboxId/file/:fileId', async (req, res) => {
 
 const saveDropboxHandler = async event => {
   let formData;
-  if (event.isBase64Encoded) {
-    event.body = Buffer.from(event.body, 'base64').toString('binary');
+  if (event.isBase64Encoded) event.body = Buffer.from(event.body, 'base64').toString('binary');
+  if (event.headers['Content-Type'] && event.headers['Content-Type'].startsWith('multipart/form-data')) {
     formData = multipart.parse(event);
   } else {
     formData = querystring.parse(event.body);
   }
 
-  await saveDropbox(event.pathParameters.id, formData);
+  await saveDropbox(event.pathParameters.dropboxId, formData);
 
   return {
     statusCode: 302,
@@ -119,7 +118,7 @@ const saveDropboxHandler = async event => {
 
 const deleteDocumentHandler = async (event) => {
   if(event.isBase64Encoded) event.body = Buffer.from(event.body, 'base64').toString('binary')
-  const formData = parse(event.body)
+  const formData = querystring.parse(event.body)
   if(formData._method === 'DELETE'){
     await deleteDocument(event.pathParameters.dropboxId, event.pathParameters.documentId);
   }
