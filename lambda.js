@@ -46,7 +46,7 @@ app.get('/dropboxes/new', async (req, res) => {
       dropboxId = generateRandomString(15);
       await createEmptyDropbox(dropboxId);
       res.cookie('customerToken', createSessionToken(dropboxId), {
-        maxAge: 86400 * 30
+        maxAge: 86400 * 30 * 1000
       });
     }
     res.redirect(`${pathPrefix}/dropboxes/${dropboxId}`);
