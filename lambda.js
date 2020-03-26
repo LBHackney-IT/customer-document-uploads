@@ -8,13 +8,15 @@ const {
   saveDropbox,
   getDropboxes,
   createEmptyDropbox,
-  getDownloadUrl
+  getDownloadUrl,
+  deleteDocument
 } = require('./lib/Dependencies');
 const serverless = require('serverless-http');
 const express = require('express');
 const multipart = require('aws-lambda-multipart-parser');
 const app = express();
 const pathPrefix = process.env.stage === 'dev' ? '' : `/${process.env.stage}`;
+const { parse } = require('querystring')
 
 app.use(express.static(__dirname + '/static'));
 
@@ -108,6 +110,19 @@ const saveDropboxHandler = async (event) => {
   };
 }
 
+const deleteDocumentHandler = async (event) => {
+  if(event.isBase64Encoded) event.body = Buffer.from(event.body, 'base64').toString('binary')
+  const formData = parse(event.body)
+  if(formData._method === 'DELETE'){
+    await deleteDocument(event.pathParameters.dropboxId, event.pathParameters.documentId);
+  }
+
+  return {
+    statusCode: 302,
+    headers: { Location: `${pathPrefix}/dropboxes/${event.pathParameters.dropboxId}` }
+  };
+}
+
 const root = async () => {
   return {
     statusCode: 302,
@@ -118,5 +133,6 @@ const root = async () => {
 module.exports = {
   handler: serverless(app),
   root,
-  saveDropbox: saveDropboxHandler
+  saveDropbox: saveDropboxHandler,
+  deleteDocument: deleteDocumentHandler
 };

@@ -59,6 +59,12 @@ functions:
       - http:
           path: '/dropboxes/{id}'
           method: POST
+  deleteDocument:
+    handler: lambda.deleteDocument
+    events:
+      - http:
+          path: '/dropboxes/{dropboxId}/documents/{documentId}'
+          method: POST
   main:
     handler: lambda.handler
     events:

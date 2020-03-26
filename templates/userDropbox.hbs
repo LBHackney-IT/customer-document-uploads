@@ -4,8 +4,13 @@
 <h3>Files:</h3>
 <ul>
   {{#each dropbox.uploads }}
-    <li><a href="{{../pathPrefix}}/dropboxes/{{../dropboxId}}/file/{{@key}}" target="_blank">{{this.title}} -
-        {{this.fileName}}</a></li>
+    <li><a href="{{ ../pathPrefix }}/dropboxes/{{ ../dropboxId }}/file/{{ @key }}" target="_blank">{{this.title}} -
+        {{this.fileName}}</a>
+      <form method="POST" action="{{ ../pathPrefix }}/dropboxes/{{ ../dropboxId }}/documents/{{ @key }}" onSubmit="javascript: return confirm('Are you sure you want to delete this document?');">
+        <input type="hidden" name="_method" value="DELETE"/>
+        <button>Delete document</button>
+      </form>
+    </li>
   {{/each}}
 </ul>
 <form action="" method="POST" encType="multipart/form-data">
