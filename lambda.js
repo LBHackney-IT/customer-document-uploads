@@ -105,10 +105,15 @@ app.get('/dropboxes/:dropboxId/file/:fileId', async (req, res) => {
   }
 });
 
+const isMultipart = (event) => {
+  const contentType = event.headers['Content-Type'] || event.headers['content-type'];
+  return contentType && contentType.startsWith('multipart/form-data')
+}
+
 const saveDropboxHandler = async event => {
   let formData;
   if (event.isBase64Encoded) event.body = Buffer.from(event.body, 'base64').toString('binary');
-  if (event.headers['Content-Type'] && event.headers['Content-Type'].startsWith('multipart/form-data')) {
+  if (isMultipart(event)) {
     formData = multipart.parse(event);
   } else {
     formData = querystring.parse(event.body);
