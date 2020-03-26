@@ -16,7 +16,7 @@ const serverless = require('serverless-http');
 const express = require('express');
 const multipart = require('aws-lambda-multipart-parser');
 const app = express();
-const pathPrefix = process.env.stage === 'dev' ? '' : `/${process.env.stage}`;
+const pathPrefix = '';
 const { parse } = require('querystring')
 
 app.use(express.static(__dirname + '/static'));
