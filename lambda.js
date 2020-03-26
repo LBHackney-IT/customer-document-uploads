@@ -13,6 +13,7 @@ const urlPrefix = process.env.stage === 'dev' ? '' : `/${process.env.stage}`;
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(formidableMiddleware());
+app.use(express.static(__dirname + '/static'));
 
 app.get('/login', async (req, res) => {
   const html = templates.loginTemplate({ urlPrefix });
