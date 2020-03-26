@@ -6,6 +6,9 @@ provider:
   memorySize: 256
   stage: ${opt:stage, 'dev'}
   region: eu-west-2
+  apiGateway:
+    binaryMediaTypes:
+      - 'multipart/form-data'
   iamRoleStatements:
     - Effect: Allow
       Action:
@@ -50,6 +53,12 @@ functions:
       - http:
           path: '/'
           method: GET
+  saveDropbox:
+    handler: lambda.saveDropbox
+    events:
+      - http:
+          path: '/dropboxes/{id}'
+          method: POST
   main:
     handler: lambda.handler
     events:

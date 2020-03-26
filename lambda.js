@@ -12,13 +12,10 @@ const {
 } = require('./lib/Dependencies');
 const serverless = require('serverless-http');
 const express = require('express');
-const bodyParser = require('body-parser');
-const formidableMiddleware = require('express-formidable');
+const multipart = require('aws-lambda-multipart-parser');
 const app = express();
 const pathPrefix = process.env.stage === 'dev' ? '' : `/${process.env.stage}`;
 
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(formidableMiddleware());
 app.use(express.static(__dirname + '/static'));
 
 app.get('/login', async (req, res) => {
@@ -100,10 +97,16 @@ app.get('/dropboxes/:dropboxId/file/:fileId', async (req, res) => {
   }
 });
 
-app.post('/dropboxes/:id', async (req, res) => {
-  await saveDropbox(req.params.id, req.fields, req.files.newUploadFile);
-  res.redirect(`${urlPrefix}/dropboxes/${req.params.id}`);
-});
+const saveDropboxHandler = async (event) => {
+  if(event.isBase64Encoded) event.body = Buffer.from(event.body, 'base64').toString('binary')
+  const formData = multipart.parse(event);
+  await saveDropbox(event.pathParameters.id, formData);
+
+  return {
+    statusCode: 302,
+    headers: { Location: `${pathPrefix}/dropboxes/${event.pathParameters.id}` }
+  };
+}
 
 const root = async () => {
   return {
@@ -114,5 +117,6 @@ const root = async () => {
 
 module.exports = {
   handler: serverless(app),
-  root
+  root,
+  saveDropbox: saveDropboxHandler
 };
