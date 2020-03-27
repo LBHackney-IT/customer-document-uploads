@@ -1,52 +1,72 @@
 {{> header }}
-<p>Your secure way to send your documents to Hackney Council.</p>
+<p>A secure way to send your documents to Hackney Council.</p>
 <section>
   <h2>1. Upload your documents</h2>
-  <p>Upload as many documents as you need to, one at a time. Give them a description so it's clear which one is which.</p>
+  <p>Upload documents one at a time, and describe what each one is.
+  </p>
   {{#if dropbox.hasUploads }}
     <h3>Your uploaded Documents:</h3>
+    <ol id="uploads">
+      {{#each dropbox.uploads }}
+        <li>
+          <a href="{{../pathPrefix}}/dropboxes/{{../dropboxId}}/file/{{@key}}" target="_blank">{{this.fileName}}</a>
+          {{#if this.title }} - {{this.title}}{{/if }}
+          <form method="POST" action="{{ ../pathPrefix }}/dropboxes/{{ ../dropboxId }}/documents/{{ @key }}"
+            onSubmit="javascript: return confirm('Are you sure you want to delete this document?');">
+            <input type="hidden" name="_method" value="DELETE" />
+            <button class="btn btn-danger">Delete</button>
+          </form>
+        </li>
+      {{/each}}
+    </ol>
   {{/if }}
-  <ol>
-    {{#each dropbox.uploads }}
-      <li>
-        <a href="{{../pathPrefix}}/dropboxes/{{../dropboxId}}/file/{{@key}}" target="_blank">{{this.fileName}}</a>
-        {{#if this.title }} - {{this.title}}{{/if }}
-        <form method="POST" action="{{ ../pathPrefix }}/dropboxes/{{ ../dropboxId }}/documents/{{ @key }}" onSubmit="javascript: return confirm('Are you sure you want to delete this document?');">
-          <input type="hidden" name="_method" value="DELETE" />
-          <button>Delete document</button>
-        </form>
-      </li>
-    {{/each}}
-  </ol>
   <form action="" method="POST" enctype="multipart/form-data">
-    <div class="form-row">
-      <label for="newUploadFile">Select file:</label>
-      <input type="file" name="newUploadFile" />
+    <div class="form-group">
+      <label for="newUploadFile">Select file</label>
+      <input type="file" class="form-control" id="newUploadFile" name="newUploadFile" />
     </div>
-    <div class="form-row">
-      <label for="newUploadTitle">File description (optional):</label>
-      <input type="text" name="newUploadTitle" />
+    <div class="form-group">
+      <label for="newUploadTitle">File description</label>
+      <input type="text" class="form-control" id="newUploadTitle" name="newUploadTitle"
+        placeholder='Explain what the document is, eg. "passport scan"' required />
     </div>
-    <div class="form-row">
-      <button type="submit">Upload Document</button>
-    </div>
-  </form>
-</section>
-<section>
-  <h2>2. Add your details:</h2>
-  <p>Enter your name and tell us what the documents are for. Click "Submit Documents" to send the documents to us</p>
-  <form action="" method="POST">
-    <div class="form-row">
-      <label for="customerName">Your name:</label>
-      <input type="text" name="customerName" value="{{ dropbox.customerName }}">
-    </div>
-    <div class="form-row">
-      <label for="description">What are these documents for?:</label>
-      <textarea name="description">{{ dropbox.description }}</textarea>
-    </div>
-    <div class="form-row">
-      <button type="submit">Submit Documents</button>
+    <div class="form-group">
+      <button type="submit" class="btn btn-block btn-lg btn-primary">Upload Document</button>
     </div>
   </form>
 </section>
-{{> footer }}
+{{#if dropbox.hasUploads }}
+  <section>
+    <h2>2. Add your details:</h2>
+    <p>
+      Enter your name and a reason for uploading these documents. Click "Submit Documents" to send the documents to us.
+    </p>
+    <form action="" method="POST">
+      <div class="form-group">
+        <label for="customerName">Your name</label>
+        <input type="text" class="form-control" id="customerName" name="customerName" value="{{ dropbox.customerName }}"
+          required />
+      </div>
+      <div class="form-group">
+        <label for="customerEmail">Email</label>
+        <input type="text" class="form-control" id="customerEmail" name="customerEmail"
+          value="{{ dropbox.customerEmail }}" />
+      </div>
+      <div class="form-group">
+        <label for="customerPhone">Phone number</label>
+        <input type="text" class="form-control" id="customerPhone" name="customerPhone"
+          value="{{ dropbox.customerPhone }}" />
+      </div>
+      <div class="form-group">
+        <label for="description">Why are you uploading these documents?</label>
+        <textarea class="form-control" id="description" name="description" rows="3"
+          placeholder='Give a reason for uploading the documents, eg. "to apply for change of circumstance"'
+          required>{{ dropbox.description }}</textarea>
+      </div>
+      <div class="form-group">
+        <button type="submit" class="btn btn-block btn-lg btn-primary">Submit Documents</button>
+      </div>
+    </form>
+  </section>
+{{/if }}
+{{> footer showLink=true }}

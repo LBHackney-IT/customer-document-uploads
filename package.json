@@ -8,7 +8,7 @@
     "start": "sls offline start -s dev --noAuth",
     "deploy": "sls deploy --aws-profile docuploads --stage production",
     "debug": "node --inspect ./node_modules/serverless/bin/serverless offline -s dev --noAuth",
-    "dynamo": "sls dynamodb start && dynamodb admin",
+    "dynamo": "sls dynamodb start",
     "lint": "eslint --fix --ext js ./*.js && echo 'Lint complete.'"
   },
   "repository": {

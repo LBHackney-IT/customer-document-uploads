@@ -1,8 +1,25 @@
 {{> header }}
-<h3>Dropboxes</h3>
-<ul>
-  {{#each dropboxes}}
-    <li><a href="{{ ../pathPrefix }}/dropboxes/{{this.dropboxId}}/view">{{this.customerName}}</a></li>
-  {{/each}}
-</ul>
+<h3>Customer Uploads</h3>
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th scope="col">Name</th>
+      <th scope="col">Docs</th>
+      <th scope="col">Upload Reason</th>
+      <th scope="col">Email</th>
+      <th scope="col">Phone</th>
+    </tr>
+  </thead>
+  <tbody>
+    {{#each dropboxes}}
+      <tr>
+        <td scope="row"><a href="{{ ../pathPrefix }}/dropboxes/{{this.dropboxId}}/view">{{this.customerName}}</a></td>
+        <td>{{this.count}}</td>
+        <td>{{this.description}}</td>
+        <td>{{this.customerEmail}}</td>
+        <td>{{this.customerPhone}}</td>
+      </tr>
+    {{/each}}
+  </tbody>
+</table>
 {{> footer }}

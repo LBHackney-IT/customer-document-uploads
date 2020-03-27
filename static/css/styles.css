@@ -1,15 +1,12 @@
 html,
 body {
-  padding: 0;
-  margin: 0;
-  font-family: sans-serif;
-  font-size: 1.1em;
+  font-size: 1.05em !important;
 }
 
 header {
   width: 100%;
-  padding: 15px 0;
-  background-color: black;
+  padding: 25px 0 20px 0;
+  background-color: #00513f;
 }
 
 header svg {
@@ -17,67 +14,29 @@ header svg {
   color: white;
 }
 
-footer{
-  padding: 50px 25px;
-  background-color: black;
+footer {
+  padding: 30px;
+  background-color: #00513f;
+  text-align: center;
 }
 
-footer a{
-  color: #FFF;
-}
-
-.container {
-  padding: 25px;
+footer a,
+footer a:hover {
+  color: #fff;
+  text-decoration: underline;
 }
 
 section {
   background-color: #f8f8f8;
   border: 1px solid #f1f1f1;
-  margin-bottom: 40px;
+  margin-bottom: 30px;
   padding: 0 15px;
 }
 
-.form-row {
-  padding: 10px 0;
+.btn-primary {
+  background-color: #00513f !important;
 }
 
-.form-row label {
-  display: block;
-}
-
-.form-row input,
-textarea {
-  background-color: white;
-  display: block;
-  width: 100%;
-  padding: 2px 0;
-  margin: 2px 0;
-  border: 1px solid grey;
-  font-family: sans-serif;
-  font-size: 1.2em;
-}
-
-.form-row input[type='file'] {
-  vertical-align: middle;
-}
-
-.form-row textarea {
-  height: 100px;
-}
-
-.form-row button {
-  width: 40%;
-  font-size: 1.1em;
-}
-
-p {
-  line-height: 1.5em;
-}
-
-ol li {
-  margin: 6px 0;
-}
-
-ol li form {
+#uploads li form {
   display: inline;
 }

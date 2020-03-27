@@ -27,7 +27,7 @@ app.get('/login', async (req, res) => {
 
 app.get('/dropboxes', async (req, res) => {
   if (authorize(req)) {
-    const dropboxes = await getDropboxes({submitted: true});
+    const dropboxes = await getDropboxes({ submitted: true });
     const html = templates.staffDropboxListTemplate({ dropboxes, pathPrefix });
     res.send(html);
   } else {
@@ -59,16 +59,21 @@ app.get('/dropboxes/:id', async (req, res) => {
   const session = getSession(req.headers);
   if (session && session.dropboxId === req.params.id) {
     const dropbox = await getDropbox(req.params.id);
-    dropbox.hasUploads = Object.keys(dropbox.uploads).length > 0;
-    const params = {
-      dropbox,
-      pathPrefix,
-      dropboxId: req.params.id
+    if (dropbox) {
+      dropbox.hasUploads = Object.keys(dropbox.uploads).length > 0;
+      const params = {
+        dropbox,
+        pathPrefix,
+        dropboxId: req.params.id
+      };
+      const html = dropbox.submitted
+        ? templates.readonlyDropboxTemplate(params)
+        : templates.createDropboxTemplate(params);
+      res.send(html);
+    } else {
+      res.clearCookie('customerToken');
+      res.redirect(`${pathPrefix}/dropboxes/new`);
     }
-    const html = dropbox.submitted
-      ? templates.readonlyDropboxTemplate(params)
-      : templates.createDropboxTemplate(params);
-    res.send(html);
   } else {
     res.redirect(`${pathPrefix}/dropboxes/new`);
   }
@@ -105,14 +110,16 @@ app.get('/dropboxes/:dropboxId/file/:fileId', async (req, res) => {
   }
 });
 
-const isMultipart = (event) => {
-  const contentType = event.headers['Content-Type'] || event.headers['content-type'];
-  return contentType && contentType.startsWith('multipart/form-data')
-}
+const isMultipart = event => {
+  const contentType =
+    event.headers['Content-Type'] || event.headers['content-type'];
+  return contentType && contentType.startsWith('multipart/form-data');
+};
 
 const saveDropboxHandler = async event => {
   let formData;
-  if (event.isBase64Encoded) event.body = Buffer.from(event.body, 'base64').toString('binary');
+  if (event.isBase64Encoded)
+    event.body = Buffer.from(event.body, 'base64').toString('binary');
   if (isMultipart(event)) {
     formData = multipart.parse(event);
   } else {
@@ -127,18 +134,24 @@ const saveDropboxHandler = async event => {
   };
 };
 
-const deleteDocumentHandler = async (event) => {
-  if(event.isBase64Encoded) event.body = Buffer.from(event.body, 'base64').toString('binary')
-  const formData = querystring.parse(event.body)
-  if(formData._method === 'DELETE'){
-    await deleteDocument(event.pathParameters.dropboxId, event.pathParameters.documentId);
+const deleteDocumentHandler = async event => {
+  if (event.isBase64Encoded)
+    event.body = Buffer.from(event.body, 'base64').toString('binary');
+  const formData = querystring.parse(event.body);
+  if (formData._method === 'DELETE') {
+    await deleteDocument(
+      event.pathParameters.dropboxId,
+      event.pathParameters.documentId
+    );
   }
 
   return {
     statusCode: 302,
-    headers: { Location: `${pathPrefix}/dropboxes/${event.pathParameters.dropboxId}` }
+    headers: {
+      Location: `${pathPrefix}/dropboxes/${event.pathParameters.dropboxId}`
+    }
   };
-}
+};
 
 const root = async () => {
   return {

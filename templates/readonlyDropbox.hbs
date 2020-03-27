@@ -1,6 +1,7 @@
 {{> header }}
 {{#if isStaff }}
-<a href="{{ pathPrefix }}/dropboxes/"><< Back to all dropboxes</a>
+  <a href="{{ pathPrefix }}/dropboxes/">
+    << Back to all dropboxes</a>
 {{/if }}
 <h3>Name:</h3>
 <p>{{ dropbox.customerName }}</p>
@@ -19,5 +20,4 @@
 {{/if }}
 <h3>Submitted on:</h3>
 <p>{{dropbox.submitted}}</p>
-
-{{> footer }}
+{{> footer showLink=true }}
