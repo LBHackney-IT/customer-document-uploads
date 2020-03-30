@@ -8,6 +8,7 @@
       <th scope="col">Upload Reason</th>
       <th scope="col">Email</th>
       <th scope="col">Phone</th>
+      <th scope="col">Submitted</th>
     </tr>
   </thead>
   <tbody>
@@ -18,6 +19,7 @@
         <td>{{this.description}}</td>
         <td>{{this.customerEmail}}</td>
         <td>{{this.customerPhone}}</td>
+        <td>{{dateFormat this.submitted}}</td>
       </tr>
     {{/each}}
   </tbody>
