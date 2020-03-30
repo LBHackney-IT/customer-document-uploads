@@ -23,6 +23,7 @@ provider:
   environment:
     DROPBOXES_TABLE: '${self:service}-${self:provider.stage}-dropboxes'
     UPLOADS_BUCKET: '${self:service}-${self:provider.stage}-uploads'
+    SENTRY_DNS: ${ssm:/customer-document-uploads/SENTRY_DSN}
     jwtsecret: ${ssm:/common/hackney-jwt-secret}
     stage: ${self:provider.stage}
 
