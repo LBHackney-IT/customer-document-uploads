@@ -19,6 +19,7 @@ provider:
         - dynamodb:UpdateItem
         - s3:PutObject
         - s3:GetObject
+        - s3:DeleteObject
       Resource: '*'
   environment:
     DROPBOXES_TABLE: '${self:service}-${self:provider.stage}-dropboxes'
