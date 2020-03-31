@@ -15,6 +15,7 @@ header svg {
 }
 
 footer {
+  margin-top: 20px;
   padding: 30px;
   background-color: #00513f;
   text-align: center;

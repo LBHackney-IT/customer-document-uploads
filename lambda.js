@@ -32,9 +32,26 @@ api.get('/css/:filename', async (req, res) => {
   });
 });
 
+api.use(async (req, res, next) => {
+  console.log(`REQUEST: { method: ${req.method}, path: ${req.path} }`);
+  next();
+});
+
 api.get('/login', async (req, res) => {
   const html = templates.loginTemplate({ host: req.headers.host });
   res.html(html);
+});
+
+api.get('/logout', async (req, res) => {
+  res
+    .clearCookie('hackneyToken', { domain: '.hackney.gov.uk', path: '/' })
+    .send();
+  res.redirect('/login');
+});
+
+api.get('/restart', async (req, res) => {
+  res.clearCookie('customerToken').send();
+  res.redirect('/dropboxes/new');
 });
 
 api.get('/dropboxes', async (req, res) => {

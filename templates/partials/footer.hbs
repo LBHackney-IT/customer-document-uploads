@@ -1,12 +1,14 @@
 </div>
 </div>
-{{#if showLink }}
-  <footer>
-    <div class="container">
+<footer>
+  <div class="container">
+    {{#if isStaff }}
+      <a href="/logout">Logout</a>
+    {{else}}
       <a href="/dropboxes">Staff Login</a>
-      <div>
-  </footer>
-{{/if }}
+    {{/if }}
+    <div>
+</footer>
 </body>
 
 </html>
