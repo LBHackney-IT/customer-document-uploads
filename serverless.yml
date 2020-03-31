@@ -8,7 +8,7 @@ provider:
   region: eu-west-2
   apiGateway:
     binaryMediaTypes:
-      - 'multipart/form-data'
+      - '*/*'
   iamRoleStatements:
     - Effect: Allow
       Action:
@@ -24,7 +24,7 @@ provider:
   environment:
     DROPBOXES_TABLE: '${self:service}-${self:provider.stage}-dropboxes'
     UPLOADS_BUCKET: '${self:service}-${self:provider.stage}-uploads'
-    SENTRY_DNS: ${ssm:/customer-document-uploads/SENTRY_DSN}
+    SENTRY_DSN: ${ssm:/customer-document-uploads/SENTRY_DSN}
     jwtsecret: ${ssm:/common/hackney-jwt-secret}
     stage: ${self:provider.stage}
 
@@ -50,25 +50,27 @@ plugins:
 
 functions:
   root:
-    handler: lambda.root
+    handler: root.handler
+    package:
+      exclude:
+        - '**'
+      include:
+        - root.js
     events:
       - http:
-          path: '/'
+          path: /
           method: GET
-  saveDropbox:
-    handler: lambda.saveDropbox
-    events:
-      - http:
-          path: '/dropboxes/{dropboxId}'
-          method: POST
-  deleteDocument:
-    handler: lambda.deleteDocument
-    events:
-      - http:
-          path: '/dropboxes/{dropboxId}/documents/{documentId}'
-          method: POST
-  main:
+  app:
     handler: lambda.handler
+    package:
+      exclude:
+        - '**'
+      include:
+        - lambda.js
+        - lib/**
+        - static/**
+        - templates/**
+        - node_modules/**
     events:
       - http:
           path: '{proxy+}'
@@ -106,13 +108,3 @@ resources:
         StreamSpecification:
           StreamViewType: NEW_AND_OLD_IMAGES
         TableName: ${self:provider.environment.DROPBOXES_TABLE}
-
-package:
-  exclude:
-    - '**'
-  include:
-    - lambda.js
-    - lib/**
-    - static/**
-    - templates/**
-    - node_modules/**

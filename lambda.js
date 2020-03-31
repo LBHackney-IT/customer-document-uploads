@@ -11,225 +11,142 @@ const {
   templates,
   authorize
 } = require('./lib/Dependencies');
-const querystring = require('querystring');
-const serverless = require('serverless-http');
-const express = require('express');
 const multipart = require('aws-lambda-multipart-parser');
-const app = express();
+const api = require('lambda-api')();
 const pathPrefix = '';
 
 const Sentry = require('@sentry/node');
 Sentry.init({
-  dsn: process.env.SENTRY_DNS
+  dsn: process.env.SENTRY_DSN
 });
 
-const logError = async err => {
+api.use(async (err, req, res, next) => {
   console.log(err);
   console.log(`Sentry eventId: ${Sentry.captureException(err)}`);
   await Sentry.flush();
-};
+  next();
+});
 
-app.use(express.static(__dirname + '/static'));
+api.get('/css/:filename', async (req, res) => {
+  res.sendFile(req.params.filename, {
+    root: 'static/css/'
+  });
+});
 
-app.get('/login', async (req, res) => {
-  try {
-    const html = templates.loginTemplate({ pathPrefix });
-    res.send(html);
-  } catch (err) {
-    await logError(err);
-    res.sendStatus(500);
+api.get('/login', async (req, res) => {
+  const html = templates.loginTemplate({ pathPrefix, host: req.headers.host });
+  res.html(html);
+});
+
+api.get('/dropboxes', async (req, res) => {
+  if (authorize(req)) {
+    const dropboxes = await getDropboxes({ submitted: true });
+    const html = templates.staffDropboxListTemplate({
+      dropboxes,
+      pathPrefix
+    });
+    res.html(html);
+  } else {
+    res.redirect(`${pathPrefix}/login`);
   }
 });
 
-app.get('/dropboxes', async (req, res) => {
-  try {
-    if (authorize(req)) {
-      const dropboxes = await getDropboxes({ submitted: true });
-      const html = templates.staffDropboxListTemplate({
-        dropboxes,
-        pathPrefix
+api.get('/dropboxes/new', async (req, res) => {
+  if (authorize(req)) {
+    res.redirect(`${pathPrefix}/dropboxes`);
+  } else {
+    const session = getSession(req.headers);
+
+    if (session && session.dropboxId) {
+      res.redirect(`${pathPrefix}/dropboxes/${session.dropboxId}`);
+    } else {
+      const dropboxId = generateRandomString(15);
+      await createEmptyDropbox(dropboxId);
+      res.cookie('customerToken', createSessionToken(dropboxId), {
+        maxAge: 86400 * 30 * 1000
       });
-      res.send(html);
-    } else {
-      res.redirect(`${pathPrefix}/login`);
-    }
-  } catch (err) {
-    await logError(err);
-    res.sendStatus(500);
-  }
-});
-
-app.get('/dropboxes/new', async (req, res) => {
-  try {
-    if (authorize(req)) {
-      res.redirect(`${pathPrefix}/dropboxes`);
-    } else {
-      let dropboxId;
-      const session = getSession(req.headers);
-
-      if (session && session.dropboxId) {
-        dropboxId = session.dropboxId;
-      } else {
-        dropboxId = generateRandomString(15);
-        await createEmptyDropbox(dropboxId);
-        res.cookie('customerToken', createSessionToken(dropboxId), {
-          maxAge: 86400 * 30 * 1000
-        });
-      }
       res.redirect(`${pathPrefix}/dropboxes/${dropboxId}`);
     }
-  } catch (err) {
-    await logError(err);
-    res.sendStatus(500);
   }
 });
 
-app.get('/dropboxes/:id', async (req, res) => {
-  try {
-    const session = getSession(req.headers);
-    if (session && session.dropboxId === req.params.id) {
-      const dropbox = await getDropbox(req.params.id);
-      if (dropbox) {
-        dropbox.hasUploads = Object.keys(dropbox.uploads).length > 0;
-        const params = {
-          dropbox,
-          pathPrefix,
-          dropboxId: req.params.id
-        };
-        const html = dropbox.submitted
-          ? templates.readonlyDropboxTemplate(params)
-          : templates.createDropboxTemplate(params);
-        res.send(html);
-      } else {
-        res.clearCookie('customerToken');
-        res.redirect(`${pathPrefix}/dropboxes/new`);
-      }
-    } else {
-      res.redirect(`${pathPrefix}/dropboxes/new`);
-    }
-  } catch (err) {
-    await logError(err);
-    res.sendStatus(500);
-  }
-});
-
-app.get('/dropboxes/:id/view', async (req, res) => {
-  try {
-    if (authorize(req)) {
-      const dropbox = await getDropbox(req.params.id);
+api.get('/dropboxes/:id', async (req, res) => {
+  const session = getSession(req.headers);
+  if (session && session.dropboxId === req.params.id) {
+    const dropbox = await getDropbox(req.params.id);
+    if (dropbox) {
       dropbox.hasUploads = Object.keys(dropbox.uploads).length > 0;
-      const html = templates.readonlyDropboxTemplate({
+      const params = {
         dropbox,
         pathPrefix,
-        dropboxId: req.params.id,
-        isStaff: true
-      });
-      res.send(html);
+        dropboxId: req.params.id
+      };
+      const html = dropbox.submitted
+        ? templates.readonlyDropboxTemplate(params)
+        : templates.createDropboxTemplate(params);
+      res.html(html);
     } else {
-      res.redirect(`${pathPrefix}/login`);
+      res.clearCookie('customerToken');
+      res.redirect(`${pathPrefix}/dropboxes/new`);
     }
-  } catch (err) {
-    await logError(err);
-    res.sendStatus(500);
+  } else {
+    res.redirect(`${pathPrefix}/dropboxes/new`);
   }
 });
 
-app.get('/dropboxes/:dropboxId/file/:fileId', async (req, res) => {
-  try {
-    const dropbox = await getDropbox(req.params.dropboxId);
-    const file = dropbox.uploads[req.params.fileId];
-    if (file) {
-      const signedUrl = await getDownloadUrl(
-        req.params.dropboxId,
-        req.params.fileId,
-        file.fileName
-      );
-      res.redirect(signedUrl);
-    } else {
-      res.send(404);
-    }
-  } catch (err) {
-    await logError(err);
-    res.sendStatus(500);
+api.get('/dropboxes/:id/view', async (req, res) => {
+  if (authorize(req)) {
+    const dropbox = await getDropbox(req.params.id);
+    dropbox.hasUploads = Object.keys(dropbox.uploads).length > 0;
+    const html = templates.readonlyDropboxTemplate({
+      dropbox,
+      pathPrefix,
+      dropboxId: req.params.id,
+      isStaff: true
+    });
+    res.html(html);
+  } else {
+    res.redirect(`${pathPrefix}/login`);
   }
 });
 
-const isMultipart = event => {
+api.get('/dropboxes/:dropboxId/files/:fileId', async (req, res) => {
+  const dropbox = await getDropbox(req.params.dropboxId);
+  const file = dropbox.uploads[req.params.fileId];
+  if (file) {
+    const signedUrl = await getDownloadUrl(
+      req.params.dropboxId,
+      req.params.fileId,
+      file.fileName
+    );
+    res.redirect(signedUrl);
+  } else {
+    res.sendStatus(404);
+  }
+});
+
+const isMultipart = req => {
   const contentType =
-    event.headers['Content-Type'] || event.headers['content-type'];
+    req.headers['Content-Type'] || req.headers['content-type'];
   return contentType && contentType.startsWith('multipart/form-data');
 };
 
-const saveDropboxHandler = async event => {
-  try {
-    let formData;
-    if (event.isBase64Encoded)
-      event.body = Buffer.from(event.body, 'base64').toString('binary');
-    if (isMultipart(event)) {
-      formData = multipart.parse(event);
-    } else {
-      formData = querystring.parse(event.body);
-    }
-
-    await saveDropbox(event.pathParameters.dropboxId, formData);
-
-    return {
-      statusCode: 302,
-      headers: {
-        Location: `${pathPrefix}/dropboxes/${event.pathParameters.id}`
-      }
-    };
-  } catch (err) {
-    await logError(err);
-    return {
-      statusCode: 500
-    };
+api.post('/dropboxes/:id', async (req, res) => {
+  if (isMultipart(req)) {
+    await saveDropbox(req.params.id, multipart.parse(req));
+  } else {
+    await saveDropbox(req.params.id, req.body);
   }
-};
+  res.redirect(`${pathPrefix}/dropboxes/${req.params.id}`);
+});
 
-const deleteDocumentHandler = async event => {
-  try {
-    if (event.isBase64Encoded)
-      event.body = Buffer.from(event.body, 'base64').toString('binary');
-    const formData = querystring.parse(event.body);
-    if (formData._method === 'DELETE') {
-      await deleteDocument(
-        event.pathParameters.dropboxId,
-        event.pathParameters.documentId
-      );
-    }
-
-    return {
-      statusCode: 302,
-      headers: {
-        Location: `${pathPrefix}/dropboxes/${event.pathParameters.dropboxId}`
-      }
-    };
-  } catch (err) {
-    await logError(err);
-    return {
-      statusCode: 500
-    };
-  }
-};
-
-const root = async () => {
-  try {
-    return {
-      statusCode: 302,
-      headers: { Location: `${pathPrefix}/dropboxes/new` }
-    };
-  } catch (err) {
-    await logError(err);
-    return {
-      statusCode: 500
-    };
-  }
-};
+api.delete('/dropboxes/:dropboxId/files/:fileId', async (req, res) => {
+  await deleteDocument(req.params.dropboxId, req.params.fileId);
+  res.redirect(`${pathPrefix}/dropboxes/${req.params.dropboxId}`);
+});
 
 module.exports = {
-  handler: serverless(app),
-  root,
-  saveDropbox: saveDropboxHandler,
-  deleteDocument: deleteDocumentHandler
+  handler: async (event, context) => {
+    return await api.run(event, context);
+  }
 };
