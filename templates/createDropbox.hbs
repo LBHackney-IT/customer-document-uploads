@@ -11,8 +11,9 @@
         <li>
           <a href="/dropboxes/{{../dropboxId}}/files/{{@key}}" target="_blank">{{this.fileName}}</a>
           {{#if this.title }} - {{this.title}}{{/if }}
-          <form method="DELETE" action="/dropboxes/{{ ../dropboxId }}/files/{{ @key }}"
+          <form method="POST" action="/dropboxes/{{ ../dropboxId }}/files/{{ @key }}"
             onSubmit="javascript: return confirm('Are you sure you want to delete this document?');">
+            <input type="hidden" name="_method" value="DELETE" />
             <button class="btn btn-danger">Delete</button>
           </form>
         </li>

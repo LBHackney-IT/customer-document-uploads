@@ -153,8 +153,10 @@ api.post('/dropboxes/:id', async (req, res) => {
   res.redirect(`/dropboxes/${req.params.id}`);
 });
 
-api.delete('/dropboxes/:dropboxId/files/:fileId', async (req, res) => {
-  await deleteDocument(req.params.dropboxId, req.params.fileId);
+api.post('/dropboxes/:dropboxId/files/:fileId', async (req, res) => {
+  if (req.body._method === 'DELETE') {
+    await deleteDocument(req.params.dropboxId, req.params.fileId);
+  }
   res.redirect(`/dropboxes/${req.params.dropboxId}`);
 });
 
