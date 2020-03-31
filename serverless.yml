@@ -79,6 +79,15 @@ resources:
       Type: AWS::S3::Bucket
       Properties:
         BucketName: ${self:provider.environment.UPLOADS_BUCKET}
+        PublicAccessBlockConfiguration:
+          BlockPublicAcls: true
+          BlockPublicPolicy: true
+          IgnorePublicAcls: true
+          RestrictPublicBuckets: true
+        BucketEncryption:
+          ServerSideEncryptionConfiguration:
+            - ServerSideEncryptionByDefault:
+                SSEAlgorithm: AES256
     UploadsDynamoDbTable:
       Type: 'AWS::DynamoDB::Table'
       DeletionPolicy: Retain
@@ -99,10 +108,10 @@ resources:
 
 package:
   exclude:
-    - '.circleci/**'
-    - '.dynamodb/**'
-    - '.s3local/**'
-    - '.serverless/**'
-    - '.vscode/**'
-    - '.circleci/**'
-    - 'README.md'
+    - '**'
+  include:
+    - lambda.js
+    - lib/**
+    - static/**
+    - templates/**
+    - node_modules/**
