@@ -1,6 +1,6 @@
 {{> header }}
 {{#if isStaff }}
-  <a href="{{ pathPrefix }}/dropboxes/">
+  <a href="/dropboxes">
     << Back to all dropboxes</a>
 {{/if }}
 <h3>Name:</h3>
@@ -12,7 +12,7 @@
   <ol>
     {{#each dropbox.uploads }}
       <li>
-        <a href="{{../pathPrefix}}/dropboxes/{{../dropboxId}}/files/{{@key}}" target="_blank">{{this.fileName}}</a>
+        <a href="/dropboxes/{{../dropboxId}}/files/{{@key}}" target="_blank">{{this.fileName}}</a>
         {{#if this.title }} - {{this.title}}{{/if }}
       </li>
     {{/each}}

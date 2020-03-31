@@ -13,7 +13,6 @@ const {
 } = require('./lib/Dependencies');
 const multipart = require('aws-lambda-multipart-parser');
 const api = require('lambda-api')();
-const pathPrefix = '';
 
 const Sentry = require('@sentry/node');
 Sentry.init({
@@ -34,7 +33,7 @@ api.get('/css/:filename', async (req, res) => {
 });
 
 api.get('/login', async (req, res) => {
-  const html = templates.loginTemplate({ pathPrefix, host: req.headers.host });
+  const html = templates.loginTemplate({ host: req.headers.host });
   res.html(html);
 });
 
@@ -42,30 +41,29 @@ api.get('/dropboxes', async (req, res) => {
   if (authorize(req)) {
     const dropboxes = await getDropboxes({ submitted: true });
     const html = templates.staffDropboxListTemplate({
-      dropboxes,
-      pathPrefix
+      dropboxes
     });
     res.html(html);
   } else {
-    res.redirect(`${pathPrefix}/login`);
+    res.redirect('/login');
   }
 });
 
 api.get('/dropboxes/new', async (req, res) => {
   if (authorize(req)) {
-    res.redirect(`${pathPrefix}/dropboxes`);
+    res.redirect('/dropboxes');
   } else {
     const session = getSession(req.headers);
 
     if (session && session.dropboxId) {
-      res.redirect(`${pathPrefix}/dropboxes/${session.dropboxId}`);
+      res.redirect(`/dropboxes/${session.dropboxId}`);
     } else {
       const dropboxId = generateRandomString(15);
       await createEmptyDropbox(dropboxId);
       res.cookie('customerToken', createSessionToken(dropboxId), {
         maxAge: 86400 * 30 * 1000
       });
-      res.redirect(`${pathPrefix}/dropboxes/${dropboxId}`);
+      res.redirect(`/dropboxes/${dropboxId}`);
     }
   }
 });
@@ -78,7 +76,6 @@ api.get('/dropboxes/:id', async (req, res) => {
       dropbox.hasUploads = Object.keys(dropbox.uploads).length > 0;
       const params = {
         dropbox,
-        pathPrefix,
         dropboxId: req.params.id
       };
       const html = dropbox.submitted
@@ -87,10 +84,10 @@ api.get('/dropboxes/:id', async (req, res) => {
       res.html(html);
     } else {
       res.clearCookie('customerToken');
-      res.redirect(`${pathPrefix}/dropboxes/new`);
+      res.redirect('/dropboxes/new');
     }
   } else {
-    res.redirect(`${pathPrefix}/dropboxes/new`);
+    res.redirect('/dropboxes/new');
   }
 });
 
@@ -100,13 +97,12 @@ api.get('/dropboxes/:id/view', async (req, res) => {
     dropbox.hasUploads = Object.keys(dropbox.uploads).length > 0;
     const html = templates.readonlyDropboxTemplate({
       dropbox,
-      pathPrefix,
       dropboxId: req.params.id,
       isStaff: true
     });
     res.html(html);
   } else {
-    res.redirect(`${pathPrefix}/login`);
+    res.redirect('/login');
   }
 });
 
@@ -137,12 +133,12 @@ api.post('/dropboxes/:id', async (req, res) => {
   } else {
     await saveDropbox(req.params.id, req.body);
   }
-  res.redirect(`${pathPrefix}/dropboxes/${req.params.id}`);
+  res.redirect(`/dropboxes/${req.params.id}`);
 });
 
 api.delete('/dropboxes/:dropboxId/files/:fileId', async (req, res) => {
   await deleteDocument(req.params.dropboxId, req.params.fileId);
-  res.redirect(`${pathPrefix}/dropboxes/${req.params.dropboxId}`);
+  res.redirect(`/dropboxes/${req.params.dropboxId}`);
 });
 
 module.exports = {

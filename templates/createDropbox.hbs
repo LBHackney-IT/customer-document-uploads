@@ -9,9 +9,9 @@
     <ol id="uploads">
       {{#each dropbox.uploads }}
         <li>
-          <a href="{{../pathPrefix}}/dropboxes/{{../dropboxId}}/files/{{@key}}" target="_blank">{{this.fileName}}</a>
+          <a href="/dropboxes/{{../dropboxId}}/files/{{@key}}" target="_blank">{{this.fileName}}</a>
           {{#if this.title }} - {{this.title}}{{/if }}
-          <form method="DELETE" action="{{ ../pathPrefix }}/dropboxes/{{ ../dropboxId }}/files/{{ @key }}"
+          <form method="DELETE" action="/dropboxes/{{ ../dropboxId }}/files/{{ @key }}"
             onSubmit="javascript: return confirm('Are you sure you want to delete this document?');">
             <button class="btn btn-danger">Delete</button>
           </form>
