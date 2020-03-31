@@ -8,6 +8,7 @@ provider:
   region: eu-west-2
   apiGateway:
     binaryMediaTypes:
+      - 'multipart/form-data'
       - '*/*'
   iamRoleStatements:
     - Effect: Allow
@@ -60,6 +61,19 @@ functions:
       - http:
           path: /
           method: GET
+  saveDropbox:
+    handler: lambda.saveDropboxHandler
+    package:
+      exclude:
+        - '**'
+      include:
+        - lambda.js
+        - lib/**
+        - node_modules/**
+    events:
+      - http:
+          path: '/dropboxes/{dropboxId}'
+          method: POST
   app:
     handler: lambda.handler
     package:

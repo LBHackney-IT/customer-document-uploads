@@ -12,6 +12,7 @@ const {
   authorize
 } = require('./lib/Dependencies');
 const multipart = require('aws-lambda-multipart-parser');
+const querystring = require('querystring');
 const api = require('lambda-api')();
 
 const Sentry = require('@sentry/node');
@@ -138,21 +139,6 @@ api.get('/dropboxes/:dropboxId/files/:fileId', async (req, res) => {
   }
 });
 
-const isMultipart = req => {
-  const contentType =
-    req.headers['Content-Type'] || req.headers['content-type'];
-  return contentType && contentType.startsWith('multipart/form-data');
-};
-
-api.post('/dropboxes/:id', async (req, res) => {
-  if (isMultipart(req)) {
-    await saveDropbox(req.params.id, multipart.parse(req));
-  } else {
-    await saveDropbox(req.params.id, req.body);
-  }
-  res.redirect(`/dropboxes/${req.params.id}`);
-});
-
 api.post('/dropboxes/:dropboxId/files/:fileId', async (req, res) => {
   if (req.body._method === 'DELETE') {
     await deleteDocument(req.params.dropboxId, req.params.fileId);
@@ -160,8 +146,35 @@ api.post('/dropboxes/:dropboxId/files/:fileId', async (req, res) => {
   res.redirect(`/dropboxes/${req.params.dropboxId}`);
 });
 
+const isMultipart = event => {
+  const contentType =
+    event.headers['Content-Type'] || event.headers['content-type'];
+  return contentType && contentType.startsWith('multipart/form-data');
+};
+
+const saveDropboxHandler = async event => {
+  if (event.isBase64Encoded) {
+    event.body = Buffer.from(event.body, 'base64').toString('binary');
+  }
+
+  if (isMultipart(event)) {
+    await saveDropbox(event.pathParameters.dropboxId, multipart.parse(event));
+  } else {
+    await saveDropbox(
+      event.pathParameters.dropboxId,
+      querystring.parse(event.body)
+    );
+  }
+
+  return {
+    statusCode: 302,
+    headers: { Location: `/dropboxes/${event.pathParameters.dropboxId}` }
+  };
+};
+
 module.exports = {
   handler: async (event, context) => {
     return await api.run(event, context);
-  }
+  },
+  saveDropboxHandler
 };
