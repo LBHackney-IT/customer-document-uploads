@@ -142,10 +142,15 @@ api.get('/dropboxes/:dropboxId/files/:fileId', async (req, res) => {
 });
 
 api.post('/dropboxes/:dropboxId/files/:fileId', async (req, res) => {
-  if (req.body._method === 'DELETE') {
-    await deleteDocument(req.params.dropboxId, req.params.fileId);
+  const session = getSession(req.headers);
+  if (session && session.dropboxId === req.params.dropboxId) {
+    if (req.body._method === 'DELETE') {
+      await deleteDocument(req.params.dropboxId, req.params.fileId);
+    }
+    res.redirect(`/dropboxes/${req.params.dropboxId}`);
+  } else {
+    res.sendStatus(404);
   }
-  res.redirect(`/dropboxes/${req.params.dropboxId}`);
 });
 
 const isMultipart = event => {
@@ -155,23 +160,28 @@ const isMultipart = event => {
 };
 
 const saveDropboxHandler = async event => {
-  if (event.isBase64Encoded) {
-    event.body = Buffer.from(event.body, 'base64').toString('binary');
-  }
+  const session = getSession(event.headers);
+  if (session && session.dropboxId === event.pathParameters.dropboxId) {
+    if (event.isBase64Encoded) {
+      event.body = Buffer.from(event.body, 'base64').toString('binary');
+    }
 
-  if (isMultipart(event)) {
-    await saveDropbox(event.pathParameters.dropboxId, multipart.parse(event));
+    if (isMultipart(event)) {
+      await saveDropbox(event.pathParameters.dropboxId, multipart.parse(event));
+    } else {
+      await saveDropbox(
+        event.pathParameters.dropboxId,
+        querystring.parse(event.body)
+      );
+    }
+
+    return {
+      statusCode: 302,
+      headers: { Location: `/dropboxes/${event.pathParameters.dropboxId}` }
+    };
   } else {
-    await saveDropbox(
-      event.pathParameters.dropboxId,
-      querystring.parse(event.body)
-    );
+    return { statusCode: 404 };
   }
-
-  return {
-    statusCode: 302,
-    headers: { Location: `/dropboxes/${event.pathParameters.dropboxId}` }
-  };
 };
 
 module.exports = {
