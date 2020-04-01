@@ -15,17 +15,19 @@ const multipart = require('aws-lambda-multipart-parser');
 const querystring = require('querystring');
 const api = require('lambda-api')();
 
-const Sentry = require('@sentry/node');
-Sentry.init({
-  dsn: process.env.SENTRY_DSN
-});
+if(process.env.stage === 'production'){
+  const Sentry = require('@sentry/node');
+  Sentry.init({
+    dsn: process.env.SENTRY_DSN
+  });
 
-api.use(async (err, req, res, next) => {
-  console.log(err);
-  console.log(`Sentry eventId: ${Sentry.captureException(err)}`);
-  await Sentry.flush();
-  next();
-});
+  api.use(async (err, req, res, next) => {
+    console.log(err);
+    console.log(`Sentry eventId: ${Sentry.captureException(err)}`);
+    await Sentry.flush();
+    next();
+  });
+}
 
 api.get('/css/:filename', async (req, res) => {
   res.sendFile(req.params.filename, {
