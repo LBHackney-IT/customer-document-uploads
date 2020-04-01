@@ -1,9 +1,13 @@
 /// <reference types="cypress" />
+
 process.env.stage = 'test';
 process.env.DROPBOXES_TABLE = 'customer-document-uploads-test-dropboxes';
+process.env.UPLOADS_BUCKET = 'customer-document-uploads-test-uploads';
 const dbConfig = require('../../lib/DynamoDbConfig')(process.env);
 const dbConn = require('../../lib/DynamoDbConnection')(dbConfig);
 const dbGateway = require('../../lib/gateways/dynamo')(dbConn);
+const s3Config = require('../../lib/s3Config')(process.env);
+const s3Gateway = require('../../lib/gateways/s3')(s3Config);
 require('cypress-file-upload');
 
 context('Customer Actions', () => {
@@ -29,7 +33,6 @@ context('Customer Actions', () => {
           followRedirect: false
         }).then(async response => {
           expect(response.status).to.eq(302);
-
           expect(response.redirectedToUrl).to.match(dropboxUrlRegex);
 
           const dropboxId = response.redirectedToUrl.match(dropboxUrlRegex)[1];
@@ -56,14 +59,30 @@ context('Customer Actions', () => {
 
   describe('submitting documents', () => {
     it('should allow a user to upload a document', () => {
+      const file = 'foo.txt';
+      const desc = 'the description';
+
       cy.visit('http://localhost:3000/');
-      // cy.get('#newUploadFile')
-      cy.get('#newUploadFile[data-cy="file-input"]').attachFile('foo.txt');
-      cy.get('#newUploadTitle').type('the description');
+      cy.get('#newUploadFile').attachFile(file);
+      cy.get('#newUploadTitle').type(desc);
       cy.get('#uploadFile').click();
 
-      // expect(cy.get('#uploads')).to.contain('foo.txt');
-      cy.get('#uploads').should('contain', 'foo.txt');
+      cy.get('#uploads')
+        .should('contain', file)
+        .should('contain', desc);
+
+      cy.location().then(async loc => {
+        const dropboxId = loc.pathname.match(dropboxUrlRegex)[1];
+        const dropbox = await dbGateway.getDropbox(dropboxId);
+        console.log(dropbox.uploads);
+
+        const key = Object.keys(dropbox.uploads)[0];
+        const fileName = Object.values(dropbox.uploads)[0].fileName;
+
+        const bucketFile = await s3Gateway.getFile(dropboxId);
+
+        //expect(bucketFile.dropboxId).to.equal(dropboxId);
+      });
     });
   });
 });

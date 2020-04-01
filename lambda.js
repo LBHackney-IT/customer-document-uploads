@@ -15,7 +15,7 @@ const multipart = require('aws-lambda-multipart-parser');
 const querystring = require('querystring');
 const api = require('lambda-api')();
 
-if(process.env.stage === 'production'){
+if (process.env.stage === 'production') {
   const Sentry = require('@sentry/node');
   Sentry.init({
     dsn: process.env.SENTRY_DSN
@@ -93,7 +93,6 @@ api.get('/dropboxes/:id', async (req, res) => {
   if (session && session.dropboxId === req.params.id) {
     const dropbox = await getDropbox(req.params.id);
     if (dropbox) {
-      dropbox.hasUploads = Object.keys(dropbox.uploads).length > 0;
       const params = {
         dropbox,
         dropboxId: req.params.id
@@ -114,7 +113,6 @@ api.get('/dropboxes/:id', async (req, res) => {
 api.get('/dropboxes/:id/view', async (req, res) => {
   if (authorize(req)) {
     const dropbox = await getDropbox(req.params.id);
-    dropbox.hasUploads = Object.keys(dropbox.uploads).length > 0;
     const html = templates.readonlyDropboxTemplate({
       dropbox,
       dropboxId: req.params.id,
