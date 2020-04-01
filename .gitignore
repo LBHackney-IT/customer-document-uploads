@@ -108,3 +108,5 @@ dist
 
 .s3local
 *.DS_Store
+cypress/examples
+cypress/videos

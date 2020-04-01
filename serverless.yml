@@ -33,6 +33,7 @@ custom:
   dynamodb:
     stages:
       - dev
+      - test
     start:
       port: 8000
       inMemory: true
