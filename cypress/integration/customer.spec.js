@@ -74,14 +74,15 @@ context('Customer Actions', () => {
       cy.location().then(async loc => {
         const dropboxId = loc.pathname.match(dropboxUrlRegex)[1];
         const dropbox = await dbGateway.getDropbox(dropboxId);
-        console.log(dropbox.uploads);
 
-        const key = Object.keys(dropbox.uploads)[0];
-        const fileName = Object.values(dropbox.uploads)[0].fileName;
+        const fileId = Object.keys(dropbox.uploads)[0];
+        const fileName = dropbox.uploads[fileId].fileName;
+        expect(fileName).to.equal('foo.txt');
+        expect(dropbox.uploads[fileId].title).to.equal(desc);
 
-        const bucketFile = await s3Gateway.getFile(dropboxId);
-
-        //expect(bucketFile.dropboxId).to.equal(dropboxId);
+        const s3Key = `${dropboxId}/${fileId}/${fileName}`;
+        const bucketFile = await s3Gateway.getFile(s3Key);
+        expect(bucketFile.Body.toString()).to.equal('hello');
       });
     });
   });
