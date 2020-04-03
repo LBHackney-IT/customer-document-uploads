@@ -42,6 +42,7 @@ custom:
     directory: ./.s3local
     host: localhost
     address: localhost
+    allowMismatchedSignatures: true
 
 plugins:
   - serverless-offline
