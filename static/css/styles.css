@@ -41,3 +41,19 @@ section {
 #uploads li form {
   display: inline;
 }
+
+.banner {
+  text-align: center;
+  background-color: #fcf8e3;
+  padding: 10px 0;
+  font-size: 0.9em;
+}
+
+.banner-tag {
+  margin: 0 5px;
+  display: inline-block;
+  color: #fff;
+  background-color: #1d70b8;
+  padding: 2px 10px;
+  letter-spacing: 0.1em;
+}
