@@ -58,85 +58,82 @@ api.get('/restart', async (req, res) => {
 });
 
 api.get('/dropboxes', async (req, res) => {
-  if (authorize(req)) {
-    const dropboxes = await getDropboxes({ submitted: true });
-    const html = templates.staffDropboxListTemplate({
-      dropboxes
-    });
-    res.html(html);
-  } else {
-    res.redirect('/login');
+  if (!authorize(req)) {
+    return res.redirect('/login');
   }
+
+  const dropboxes = await getDropboxes({ submitted: true });
+  const html = templates.staffDropboxListTemplate({
+    dropboxes
+  });
+  res.html(html);
 });
 
 api.get('/dropboxes/new', async (req, res) => {
   if (authorize(req)) {
-    res.redirect('/dropboxes');
-  } else {
-    const session = getSession(req.headers);
-
-    if (session && session.dropboxId) {
-      res.redirect(`/dropboxes/${session.dropboxId}`);
-    } else {
-      const dropboxId = generateRandomString(15);
-      await createEmptyDropbox(dropboxId);
-      res.cookie('customerToken', createSessionToken(dropboxId), {
-        maxAge: 86400 * 30 * 1000
-      });
-      res.redirect(`/dropboxes/${dropboxId}`);
-    }
+    return res.redirect('/dropboxes');
   }
+
+  const session = getSession(req.headers);
+  if (session && session.dropboxId) {
+    return res.redirect(`/dropboxes/${session.dropboxId}`);
+  }
+
+  const dropboxId = generateRandomString(15);
+  await createEmptyDropbox(dropboxId);
+  res.cookie('customerToken', createSessionToken(dropboxId), {
+    maxAge: 86400 * 30 * 1000
+  });
+  res.redirect(`/dropboxes/${dropboxId}`);
 });
 
 api.get('/dropboxes/:id', async (req, res) => {
   const session = getSession(req.headers);
-  if (session && session.dropboxId === req.params.id) {
-    const dropbox = await getDropbox(req.params.id);
-    if (dropbox) {
-      const params = {
-        dropbox,
-        dropboxId: req.params.id
-      };
-      const html = dropbox.submitted
-        ? templates.readonlyDropboxTemplate(params)
-        : templates.createDropboxTemplate(params);
-      res.html(html);
-    } else {
-      res.clearCookie('customerToken');
-      res.redirect('/dropboxes/new');
-    }
-  } else {
-    res.redirect('/dropboxes/new');
+  if (!session || (session && session.dropboxId !== req.params.id)) {
+    return res.redirect('/dropboxes/new');
   }
+
+  const dropbox = await getDropbox(req.params.id);
+  if (!dropbox) {
+    res.clearCookie('customerToken');
+    return res.redirect('/dropboxes/new');
+  }
+
+  const params = { dropbox, dropboxId: req.params.id };
+  const html = dropbox.submitted
+    ? templates.readonlyDropboxTemplate(params)
+    : templates.createDropboxTemplate(params);
+  res.html(html);
 });
 
 api.get('/dropboxes/:id/view', async (req, res) => {
-  if (authorize(req)) {
-    const dropbox = await getDropbox(req.params.id);
-    const html = templates.readonlyDropboxTemplate({
-      dropbox,
-      dropboxId: req.params.id,
-      isStaff: true
-    });
-    res.html(html);
-  } else {
-    res.redirect('/login');
+  if (!authorize(req)) {
+    return res.redirect('/login');
   }
+
+  const dropbox = await getDropbox(req.params.id);
+  const html = templates.readonlyDropboxTemplate({
+    dropbox,
+    dropboxId: req.params.id,
+    isStaff: true
+  });
+  res.html(html);
 });
 
 api.get('/dropboxes/:dropboxId/files/:fileId', async (req, res) => {
   const dropbox = await getDropbox(req.params.dropboxId);
+
   const file = dropbox.uploads[req.params.fileId];
-  if (file) {
-    const signedUrl = await getDownloadUrl(
-      req.params.dropboxId,
-      req.params.fileId,
-      file.fileName
-    );
-    res.redirect(signedUrl);
-  } else {
-    res.sendStatus(404);
+  if (!file) {
+    return res.sendStatus(404);
   }
+
+  const signedUrl = await getDownloadUrl(
+    req.params.dropboxId,
+    req.params.fileId,
+    file.fileName
+  );
+  res.redirect(signedUrl);
 });
 
 api.post('/dropboxes/:dropboxId/files/:fileId', async (req, res) => {
@@ -145,10 +142,9 @@ api.post('/dropboxes/:dropboxId/files/:fileId', async (req, res) => {
     if (req.body._method === 'DELETE') {
       await deleteDocument(req.params.dropboxId, req.params.fileId);
     }
-    res.redirect(`/dropboxes/${req.params.dropboxId}`);
-  } else {
-    res.sendStatus(404);
+    return res.redirect(`/dropboxes/${req.params.dropboxId}`);
   }
+  res.sendStatus(404);
 });
 
 const isMultipart = event => {
@@ -159,27 +155,30 @@ const isMultipart = event => {
 
 const saveDropboxHandler = async event => {
   const session = getSession(event.headers);
-  if (session && session.dropboxId === event.pathParameters.dropboxId) {
-    if (event.isBase64Encoded) {
-      event.body = Buffer.from(event.body, 'base64').toString('binary');
-    }
-
-    if (isMultipart(event)) {
-      await saveDropbox(event.pathParameters.dropboxId, multipart.parse(event));
-    } else {
-      await saveDropbox(
-        event.pathParameters.dropboxId,
-        querystring.parse(event.body)
-      );
-    }
-
-    return {
-      statusCode: 302,
-      headers: { Location: `/dropboxes/${event.pathParameters.dropboxId}` }
-    };
-  } else {
+  if (
+    !session ||
+    (session && session.dropboxId !== event.pathParameters.dropboxId)
+  ) {
     return { statusCode: 404 };
   }
+
+  if (event.isBase64Encoded) {
+    event.body = Buffer.from(event.body, 'base64').toString('binary');
+  }
+
+  if (isMultipart(event)) {
+    await saveDropbox(event.pathParameters.dropboxId, multipart.parse(event));
+  } else {
+    await saveDropbox(
+      event.pathParameters.dropboxId,
+      querystring.parse(event.body)
+    );
+  }
+
+  return {
+    statusCode: 302,
+    headers: { Location: `/dropboxes/${event.pathParameters.dropboxId}` }
+  };
 };
 
 module.exports = {
