@@ -6,19 +6,30 @@
   </p>
   {{#if dropbox.hasUploads }}
     <h3>Your uploaded Documents:</h3>
-    <ol id="uploads">
+    <ul id="uploads">
       {{#each dropbox.uploads }}
         <li>
-          <a href="/dropboxes/{{../dropboxId}}/files/{{@key}}" target="_blank">{{this.fileName}}</a>
-          {{#if this.title }} - {{this.title}}{{/if }}
-          <form method="POST" action="/dropboxes/{{ ../dropboxId }}/files/{{ @key }}"
-            onSubmit="javascript: return confirm('Are you sure you want to delete this document?');">
-            <input type="hidden" name="_method" value="DELETE" />
-            <button class="btn btn-danger">Delete</button>
-          </form>
+          <div class="container">
+            <div class="row">
+              <div class="col-xs-1 col-sm-1 col-md-1 col-lg-1 col-xl-1">
+                {{inc @index}}.
+              </div>
+              <div class="col-xs-8 col-sm-8 col-md-8 col-lg-8 col-xl-8">
+                <a href="/dropboxes/{{../dropboxId}}/files/{{@key}}" target="_blank">{{this.fileName}}</a>
+                {{#if this.title }} - {{this.title}}{{/if }}
+              </div>
+              <div>
+                <form method="POST" action="/dropboxes/{{ ../dropboxId }}/files/{{ @key }}"
+                  onSubmit="javascript: return confirm('Are you sure you want to delete this document?');">
+                  <input type="hidden" name="_method" value="DELETE" />
+                  <button class="btn btn-danger">Delete</button>
+                </form>
+              </div>
+            </div>
+          </div>
         </li>
       {{/each}}
-    </ol>
+    </ul>
   {{/if }}
   <form action="" method="POST" enctype="multipart/form-data">
     <div class="form-group">

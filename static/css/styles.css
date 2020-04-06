@@ -38,6 +38,15 @@ section {
   background-color: #00513f !important;
 }
 
+#uploads {
+  list-style: none;
+  padding: 0;
+}
+
+#uploads li {
+  margin: 3px 0;
+}
+
 #uploads li form {
   display: inline;
 }
