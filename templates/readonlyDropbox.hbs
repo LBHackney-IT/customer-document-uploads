@@ -3,22 +3,24 @@
   <a href="/dropboxes">
     << Back to all dropboxes</a>
 {{/if }}
-<h3>Name:</h3>
-<p>{{ dropbox.customerName }}</p>
-<h3>Description:</h3>
-{{ dropbox.description }}
-{{#if dropbox.hasUploads }}
-  <h3>Uploaded Documents:</h3>
-  <ol>
-    {{#each dropbox.uploads }}
-      <li>
-        <a href="/dropboxes/{{../dropboxId}}/files/{{@key}}" target="_blank">{{this.fileName}}</a>
-        {{#if this.title }} - {{this.title}}{{/if }}
-      </li>
-    {{/each}}
-  </ol>
-{{/if }}
-<h3>Submitted on:</h3>
+<div id="dropboxContents">
+  <strong>Name:</strong>
+  <p>{{ dropbox.customerName }}</p>
+  <strong>Description:</strong>
+  <p>{{ dropbox.description }}</p>
+  {{#if dropbox.hasUploads }}
+    <strong>Uploaded Documents:</strong>
+    <ol>
+      {{#each dropbox.uploads }}
+        <li>
+          <a href="/dropboxes/{{../dropboxId}}/files/{{@key}}" target="_blank">{{this.fileName}}</a>
+          {{#if this.title }} - {{this.title}}{{/if }}
+        </li>
+      {{/each}}
+    </ol>
+  {{/if }}
+</div>
+<strong>Submitted on:</strong>
 <p>{{dateFormat dropbox.submitted}}</p>
 {{#if isStaff }}
 {{else}}

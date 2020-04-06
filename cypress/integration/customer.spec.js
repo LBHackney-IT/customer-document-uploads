@@ -13,6 +13,23 @@ require('cypress-file-upload');
 context('Customer Actions', () => {
   const dropboxUrlRegex = /\/dropboxes\/([0-9a-z]{15})/;
 
+  const getDropBoxFromUrl = async url => {
+    const dropboxId = url.match(dropboxUrlRegex)[1];
+    return await dbGateway.getDropbox(dropboxId);
+  };
+
+  const getDropBoxFiles = async dropbox => {
+    return Object.entries(dropbox.uploads).map(([fileId, file]) => {
+      file.fileId = fileId;
+      return file;
+    });
+  };
+
+  const getBucketFile = async (dropboxId, file) => {
+    const s3Key = `${dropboxId}/${file.fileId}/${file.fileName}`;
+    return await s3Gateway.getFile(s3Key);
+  };
+
   describe('coming to the service', () => {
     context("when the user doesn't have a session", () => {
       it('should redirect a new user to the new dropbox url', () => {
@@ -35,9 +52,8 @@ context('Customer Actions', () => {
           expect(response.status).to.eq(302);
           expect(response.redirectedToUrl).to.match(dropboxUrlRegex);
 
-          const dropboxId = response.redirectedToUrl.match(dropboxUrlRegex)[1];
-          const dropbox = await dbGateway.getDropbox(dropboxId);
-          expect(dropbox.dropboxId).to.equal(dropboxId);
+          const dropbox = await getDropBoxFromUrl(response.redirectedToUrl);
+          expect(dropbox).to.not.be.undefined;
         });
       });
     });
@@ -58,31 +74,74 @@ context('Customer Actions', () => {
   });
 
   describe('submitting documents', () => {
-    it('should allow a user to upload a document', () => {
-      const file = 'foo.txt';
-      const desc = 'the description';
+    it('should allow a user to upload multiple documents', () => {
+      const files = [
+        {
+          fileName: 'foo.txt',
+          description: 'the description',
+          contents: 'hello'
+        },
+        {
+          fileName: 'foo2.txt',
+          description: 'the second description',
+          contents: 'hello again'
+        }
+      ];
 
       cy.visit('http://localhost:3000/');
-      cy.get('#newUploadFile').attachFile(file);
-      cy.get('#newUploadTitle').type(desc);
+
+      // upload the files
+      files.forEach(file => {
+        cy.get('#newUploadFile').attachFile(file.fileName);
+        cy.get('#newUploadTitle').type(file.description);
+        cy.get('#uploadFile').click();
+      });
+
+      // check they are showing in the ui
+      cy.get('#uploads > li > a').each(($el, i) => {
+        cy.wrap($el).should('contain', files[i].fileName);
+      });
+
+      // check the files have been saved correctly
+      cy.location().then(async loc => {
+        const dropbox = await getDropBoxFromUrl(loc.pathname);
+        const dropboxFiles = await getDropBoxFiles(dropbox);
+
+        for (const [i, dropboxFile] of dropboxFiles.entries()) {
+          const bucketFile = await getBucketFile(
+            dropbox.dropboxId,
+            dropboxFile
+          );
+          console.log(i);
+          console.log(dropboxFile);
+          expect(dropboxFile.fileName).to.equal(files[i].fileName);
+          expect(dropboxFile.title).to.equal(files[i].description);
+          expect(bucketFile.Body.toString()).to.equal(files[i].contents);
+        }
+      });
+    });
+
+    it('should allow a user to add their details and a description and then submit the form', () => {
+      const name = 'Homer Simpson';
+      const fileName = 'foo.txt';
+      const description = 'These are for my application';
+
+      cy.visit('http://localhost:3000/');
+      cy.get('#newUploadFile').attachFile(fileName);
+      cy.get('#newUploadTitle').type('this is a foo');
       cy.get('#uploadFile').click();
 
-      cy.get('#uploads')
-        .should('contain', file)
-        .should('contain', desc);
+      cy.get('#customerName').type(name);
+      cy.get('#customerEmail').type('me@test.com');
+      cy.get('#customerPhone').type('123');
+      cy.get('#description').type(description);
+      cy.get('#submitDropbox').click();
 
-      cy.location().then(async loc => {
-        const dropboxId = loc.pathname.match(dropboxUrlRegex)[1];
-        const dropbox = await dbGateway.getDropbox(dropboxId);
-
-        const fileId = Object.keys(dropbox.uploads)[0];
-        const fileName = dropbox.uploads[fileId].fileName;
-        expect(fileName).to.equal('foo.txt');
-        expect(dropbox.uploads[fileId].title).to.equal(desc);
-
-        const s3Key = `${dropboxId}/${fileId}/${fileName}`;
-        const bucketFile = await s3Gateway.getFile(s3Key);
-        expect(bucketFile.Body.toString()).to.equal('hello');
+      cy.location().then(() => {
+        cy.get('#dropboxContents')
+          .should('contain', name)
+          .should('contain', description)
+          .should('contain', fileName);
       });
     });
   });
