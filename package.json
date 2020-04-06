@@ -9,7 +9,7 @@
     "dynamo": "sls dynamodb start -s dev",
     "start-test": "sls offline start -s test",
     "test": "cypress run",
-    "test-verbose": "cypress run --headless --browser=chrome",
+    "test-verbose": "cypress run --browser=chrome --no-exit",
     "ci": "start-server-and-test start-test http://localhost:3000/login test",
     "deploy": "sls deploy --aws-profile docuploads --stage production",
     "lint": "eslint --fix --ext js ./*.js && echo 'Lint complete.'"

@@ -30,6 +30,15 @@ context('Customer Actions', () => {
     return await s3Gateway.getFile(s3Key);
   };
 
+  const uploadAFile = (fileName, description) => {
+    cy.get('#newUploadFile').attachFile(fileName);
+    cy.get('#newUploadTitle').type(description);
+    cy.get('#uploadFile').click();
+    cy.get('#uploads')
+      .should('contain', fileName)
+      .should('contain', description);
+  };
+
   describe('coming to the service', () => {
     context("when the user doesn't have a session", () => {
       it('should redirect a new user to the new dropbox url', () => {
@@ -90,16 +99,9 @@ context('Customer Actions', () => {
 
       cy.visit('http://localhost:3000/');
 
-      // upload the files
-      files.forEach(file => {
-        cy.get('#newUploadFile').attachFile(file.fileName);
-        cy.get('#newUploadTitle').type(file.description);
-        cy.get('#uploadFile').click();
-      });
-
-      // check they are showing in the ui
-      cy.get('#uploads > li > a').each(($el, i) => {
-        cy.wrap($el).should('contain', files[i].fileName);
+      // upload the files and check they are showing in the ui
+      files.forEach((file, i) => {
+        uploadAFile(file.fileName, file.description);
       });
 
       // check the files have been saved correctly
@@ -107,18 +109,26 @@ context('Customer Actions', () => {
         const dropbox = await getDropBoxFromUrl(loc.pathname);
         const dropboxFiles = await getDropBoxFiles(dropbox);
 
-        for (const [i, dropboxFile] of dropboxFiles.entries()) {
+        const filesFromBucket = [];
+        for (const dropboxFile of dropboxFiles) {
           const bucketFile = await getBucketFile(
             dropbox.dropboxId,
             dropboxFile
           );
-          console.log(i);
-          console.log(dropboxFile);
-          expect(dropboxFile.fileName).to.equal(files[i].fileName);
-          expect(dropboxFile.title).to.equal(files[i].description);
-          expect(bucketFile.Body.toString()).to.equal(files[i].contents);
+          filesFromBucket.push({
+            fileName: dropboxFile.fileName,
+            description: dropboxFile.title,
+            contents: bucketFile.Body.toString()
+          });
         }
+
+        expect(filesFromBucket).to.have.deep.members(files);
       });
+    });
+
+    it('should not show the details form if no files have been uploaded', () => {
+      cy.visit('http://localhost:3000/');
+      cy.get('#customerName').should('not.exist');
     });
 
     it('should allow a user to add their details and a description and then submit the form', () => {
@@ -127,9 +137,8 @@ context('Customer Actions', () => {
       const description = 'These are for my application';
 
       cy.visit('http://localhost:3000/');
-      cy.get('#newUploadFile').attachFile(fileName);
-      cy.get('#newUploadTitle').type('this is a foo');
-      cy.get('#uploadFile').click();
+
+      uploadAFile(fileName, 'this is a foo');
 
       cy.get('#customerName').type(name);
       cy.get('#customerEmail').type('me@test.com');
@@ -142,6 +151,18 @@ context('Customer Actions', () => {
           .should('contain', name)
           .should('contain', description)
           .should('contain', fileName);
+      });
+    });
+
+    it('should not allow a user to submit the form if they have not entered their name', () => {
+      cy.visit('http://localhost:3000/');
+
+      uploadAFile('foo.txt', 'this is a foo');
+
+      cy.get('#submitDropbox').click();
+
+      cy.get('#customerName').then($input => {
+        expect($input[0].validationMessage).not.to.be.empty;
       });
     });
   });
