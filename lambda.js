@@ -41,7 +41,7 @@ api.use(async (req, res, next) => {
 });
 
 api.get('/login', async (req, res) => {
-  const html = templates.loginTemplate({ host: req.headers.host });
+  const html = templates.loginTemplate();
   res.html(html);
 });
 
