@@ -35,6 +35,12 @@ api.get('/css/:filename', async (req, res) => {
   });
 });
 
+api.get('/img/:filename', async (req, res) => {
+  res.sendFile(req.params.filename, {
+    root: 'static/img/'
+  });
+});
+
 api.use(async (req, res, next) => {
   console.log(`REQUEST: { method: ${req.method}, path: ${req.path} }`);
   next();
