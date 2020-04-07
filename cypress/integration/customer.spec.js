@@ -83,6 +83,10 @@ context('Customer Actions', () => {
   });
 
   describe('submitting documents', () => {
+    beforeEach(() => {
+      cy.visit('http://localhost:3000/');
+    });
+
     it('should allow a user to upload multiple documents', () => {
       const files = [
         {
@@ -96,8 +100,6 @@ context('Customer Actions', () => {
           contents: 'hello again'
         }
       ];
-
-      cy.visit('http://localhost:3000/');
 
       // upload the files and check they are showing in the ui
       files.forEach((file, i) => {
@@ -126,43 +128,80 @@ context('Customer Actions', () => {
       });
     });
 
+    it('should not allow a user to submit the upload form if they have not selected a file', () => {
+      cy.get('#uploadFile').click();
+
+      cy.get('#newUploadFile').then($input => {
+        expect($input[0].validationMessage).not.to.be.empty;
+      });
+    });
+
+    it('should not allow a user to submit the upload form if they have not added a file description', () => {
+      cy.get('#newUploadFile').attachFile('foo.txt');
+      cy.get('#uploadFile').click();
+
+      cy.get('#newUploadTitle').then($input => {
+        expect($input[0].validationMessage).not.to.be.empty;
+      });
+    });
+
     it('should not show the details form if no files have been uploaded', () => {
-      cy.visit('http://localhost:3000/');
       cy.get('#customerName').should('not.exist');
     });
 
-    it('should allow a user to add their details and a description and then submit the form', () => {
-      const name = 'Homer Simpson';
-      const fileName = 'foo.txt';
-      const description = 'These are for my application';
+    context('when a file has been uploaded', () => {
+      beforeEach(() => {
+        uploadAFile('foo.txt', 'this is a foo');
+      });
 
-      cy.visit('http://localhost:3000/');
+      it('should allow a user to add their details and a description and then submit the form', () => {
+        const name = 'Homer Simpson';
+        const fileName = 'foo.txt';
+        const description = 'These are for my application';
 
-      uploadAFile(fileName, 'this is a foo');
+        cy.get('#customerName').type(name);
+        cy.get('#customerEmail').type('me@test.com');
+        cy.get('#customerPhone').type('123');
+        cy.get('#description').type(description);
+        cy.get('#submitDropbox').click();
 
-      cy.get('#customerName').type(name);
-      cy.get('#customerEmail').type('me@test.com');
-      cy.get('#customerPhone').type('123');
-      cy.get('#description').type(description);
-      cy.get('#submitDropbox').click();
-
-      cy.location().then(() => {
         cy.get('#dropboxContents')
           .should('contain', name)
           .should('contain', description)
           .should('contain', fileName);
       });
+
+      it('should not allow a user to submit the form if they have not entered their name', () => {
+        cy.get('#submitDropbox').click();
+
+        cy.get('#customerName').then($input => {
+          expect($input[0].validationMessage).not.to.be.empty;
+        });
+      });
+
+      it('should not allow a user to submit the form if they have not entered a reason for uploading', () => {
+        cy.get('#customerName').type('Lisa Simpson');
+
+        cy.get('#submitDropbox').click();
+
+        cy.get('#description').then($input => {
+          expect($input[0].validationMessage).not.to.be.empty;
+        });
+      });
     });
 
-    it('should not allow a user to submit the form if they have not entered their name', () => {
-      cy.visit('http://localhost:3000/');
+    context('when a dropbox has been submitted', () => {
+      it('should allow the user to start again', () => {
+        uploadAFile('foo.txt', 'this is a foo');
+        cy.get('#customerName').type('Jonah Lomu');
+        cy.get('#customerEmail').type('me@test.com');
+        cy.get('#customerPhone').type('123');
+        cy.get('#description').type('These are for my wedding');
+        cy.get('#submitDropbox').click();
 
-      uploadAFile('foo.txt', 'this is a foo');
+        cy.get('#startAgain').click();
 
-      cy.get('#submitDropbox').click();
-
-      cy.get('#customerName').then($input => {
-        expect($input[0].validationMessage).not.to.be.empty;
+        cy.location('pathname').should('match', dropboxUrlRegex);
       });
     });
   });
