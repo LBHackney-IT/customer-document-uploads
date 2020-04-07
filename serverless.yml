@@ -50,12 +50,15 @@ plugins:
   - serverless-dynamodb-local
   - serverless-s3-local
 
+package:
+  individually: true
+  exclude:
+    - ./**
+
 functions:
   root:
     handler: root.handler
     package:
-      exclude:
-        - './**'
       include:
         - root.js
     events:
@@ -65,11 +68,11 @@ functions:
   saveDropbox:
     handler: lambda.saveDropboxHandler
     package:
-      exclude:
-        - './**'
       include:
         - lambda.js
         - lib/**
+        - static/**
+        - templates/**
         - node_modules/**
     events:
       - http:
@@ -78,8 +81,6 @@ functions:
   app:
     handler: lambda.handler
     package:
-      exclude:
-        - './**'
       include:
         - lambda.js
         - lib/**
