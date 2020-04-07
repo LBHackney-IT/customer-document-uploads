@@ -17,13 +17,23 @@ jobs:
       - run:
           name: Install Serverless CLI, eslint, and dependencies
           command: |
-            sudo npm i -g serverless
             sudo npm i -g eslint
+            sudo npm i -g serverless
+            sudo apt-get update && sudo apt-get install default-jre
+            java -version
             npm install
+            sls dynamodb install
+            sudo apt-get install libxss1
 
       - run:
           name: Run linting
           command: npm run lint
+
+      - run:
+          name: Run tests
+          command: |
+            echo "/customer-document-uploads/SENTRY_DSN=my_sentry_dsn\n/common/hackney-jwt-secret=my_secret" >> .env
+            npm run ci
 
       - run:
           name: Set AWS credentials
