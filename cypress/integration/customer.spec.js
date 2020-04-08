@@ -191,16 +191,22 @@ context('Customer Actions', () => {
     });
 
     context('when a dropbox has been submitted', () => {
-      it('should allow the user to start again', () => {
+      beforeEach(() => {
         uploadAFile('foo.txt', 'this is a foo');
         cy.get('#customerName').type('Jonah Lomu');
         cy.get('#customerEmail').type('me@test.com');
         cy.get('#customerPhone').type('123');
         cy.get('#description').type('These are for my wedding');
         cy.get('#submitDropbox').click();
+      });
 
+      it('should always navigate to the submitted dropbox', () => {
+        cy.visit('http://localhost:3000/');
+        cy.location('pathname').should('match', dropboxUrlRegex);
+      });
+
+      it('should allow the user to start again', () => {
         cy.get('#startAgain').click();
-
         cy.location('pathname').should('match', dropboxUrlRegex);
       });
     });
