@@ -7,9 +7,9 @@
     "start": "sls offline start -s dev",
     "debug": "node --inspect ./node_modules/serverless/bin/serverless offline -s dev",
     "dynamo": "sls dynamodb start -s dev",
+    "cypress-ui": "npx cypress open",
     "test-server": "sls offline start -s test",
     "test": "cypress run",
-    "test-browser": "cypress run --browser=chrome --no-exit",
     "ci": "start-server-and-test test-server http://localhost:3000/login test",
     "deploy": "sls deploy --aws-profile docuploads --stage production",
     "lint": "eslint --fix --ext js ./*.js && echo 'Lint complete.'"
@@ -28,7 +28,6 @@
     "aws-sdk": "^2.650.0",
     "cypress": "^4.3.0",
     "cypress-file-upload": "^4.0.4",
-    "cypress-log-to-output": "^1.0.8",
     "eslint": "^6.6.0",
     "eslint-config-prettier": "^6.5.0",
     "eslint-plugin-prettier": "^3.1.1",
