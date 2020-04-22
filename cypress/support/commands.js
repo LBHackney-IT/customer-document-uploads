@@ -30,3 +30,7 @@ Cypress.Commands.add('login', () => {
   const token = jwt.sign({ groups: [] }, Cypress.env('JWT_SECRET'), { issuer: 'Hackney' });
   cy.setCookie('hackneyToken', token, { path: '/' });
 });
+
+Cypress.Commands.add('logout', () => {
+  cy.clearCookie('hackneyToken');
+});
