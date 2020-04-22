@@ -11,7 +11,7 @@
       <th scope="col">Submitted</th>
     </tr>
   </thead>
-  <tbody>
+  <tbody data-testid="staff-dropboxes-list">
     {{#each dropboxes}}
       <tr>
         <td scope="row"><a href="/dropboxes/{{this.dropboxId}}/view">{{this.customerName}}</a></td>
