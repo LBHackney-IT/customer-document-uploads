@@ -1,10 +1,15 @@
 version: 2.1
-jobs:
-  build:
+
+executors:
+  node:
     docker:
       - image: circleci/node:12.13
 
     working_directory: ~/repo
+
+jobs:
+  build:
+    executor: node
 
     steps:
       - checkout
@@ -27,20 +32,34 @@ jobs:
 
       - run:
           name: Run tests
+          environment:
+            CYPRESS_JWT_SECRET: my_secret
           command: |
-            echo "/customer-document-uploads/SENTRY_DSN=my_sentry_dsn\n/common/hackney-jwt-secret=my_secret" >> .env
+            echo -e "/customer-document-uploads/SENTRY_DSN=my_sentry_dsn\n/common/hackney-jwt-secret=my_secret" >> .env
             npm run ci
+  
+  deploy:
+    executor: node
 
+    steps:
       - run:
           name: Set AWS credentials
           command: |
             ./node_modules/serverless/bin/serverless config credentials --provider aws --key ${AWS_ACCESS_KEY_ID} --secret ${AWS_SECRET_ACCESS_KEY} --profile docuploads
 
-      # - save_cache:
-      #     paths:
-      #       - node_modules
-      #     key: v1-dependencies-{{ checksum "package-lock.json" }}
-
       - run:
           name: Deploy application
           command: ./node_modules/serverless/bin/serverless deploy -s production
+
+workflows:
+  version: 2
+  build-and-deploy-when-master:
+    jobs:
+      - build
+      - deploy:
+          requires:
+            - build
+          filters:
+            branches:
+              only:
+                - master

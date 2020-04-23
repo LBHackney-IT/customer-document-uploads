@@ -69,13 +69,13 @@ context('Customer Actions', () => {
 
     context('when the user has a session', () => {
       it('should redirect to their existing dropbox url', () => {
-        cy.visit('http://localhost:3000/');
+        cy.visit('/');
         cy.location()
           .then(loc => {
             return loc.pathname;
           })
           .then(path => {
-            cy.visit('http://localhost:3000/');
+            cy.visit('/');
             cy.location('pathname').should('eq', path);
           });
       });
@@ -84,7 +84,7 @@ context('Customer Actions', () => {
 
   describe('submitting documents', () => {
     beforeEach(() => {
-      cy.visit('http://localhost:3000/');
+      cy.visit('/');
     });
 
     it('should allow a user to upload multiple documents', () => {
@@ -201,7 +201,7 @@ context('Customer Actions', () => {
       });
 
       it('should always navigate to the submitted dropbox', () => {
-        cy.visit('http://localhost:3000/');
+        cy.visit('/');
         cy.location('pathname').should('match', dropboxUrlRegex);
       });
 

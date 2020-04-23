@@ -1,9 +1,9 @@
 {{> header }}
 {{#if isStaff }}
-  <a href="/dropboxes">
+  <a href="/dropboxes" data-testid="dropbox-list-return-link">
     << Back to all dropboxes</a>
 {{/if }}
-<div id="dropboxContents">
+<div id="dropboxContents" data-testid="dropbox-details">
   <strong>Name:</strong>
   <p>{{ dropbox.customerName }}</p>
   <strong>Description:</strong>
