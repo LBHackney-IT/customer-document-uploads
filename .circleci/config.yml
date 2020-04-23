@@ -37,6 +37,10 @@ jobs:
           command: |
             echo -e "/customer-document-uploads/SENTRY_DSN=my_sentry_dsn\n/common/hackney-jwt-secret=my_secret" >> .env
             npm run ci
+
+      - persist_to_workspace:
+          root: ~/repo
+          paths: .
   
   deploy:
     executor: node
