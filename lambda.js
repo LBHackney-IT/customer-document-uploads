@@ -14,9 +14,9 @@ const {
 const multipart = require('aws-lambda-multipart-parser');
 const querystring = require('querystring');
 const api = require('lambda-api')();
+const Sentry = require('@sentry/node');
 
 if (process.env.stage === 'production') {
-  const Sentry = require('@sentry/node');
   Sentry.init({
     dsn: process.env.SENTRY_DSN
   });
@@ -160,31 +160,37 @@ const isMultipart = event => {
 };
 
 const saveDropboxHandler = async event => {
-  const session = getSession(event.headers);
-  if (
-    !session ||
-    (session && session.dropboxId !== event.pathParameters.dropboxId)
-  ) {
-    return { statusCode: 404 };
-  }
+  try {
+    const session = getSession(event.headers);
+    if (
+      !session ||
+      (session && session.dropboxId !== event.pathParameters.dropboxId)
+    ) {
+      return { statusCode: 404 };
+    }
 
-  if (event.isBase64Encoded) {
-    event.body = Buffer.from(event.body, 'base64').toString('binary');
-  }
+    if (event.isBase64Encoded) {
+      event.body = Buffer.from(event.body, 'base64').toString('binary');
+    }
 
-  if (isMultipart(event)) {
-    await saveDropbox(event.pathParameters.dropboxId, multipart.parse(event));
-  } else {
-    await saveDropbox(
-      event.pathParameters.dropboxId,
-      querystring.parse(event.body)
-    );
-  }
+    if (isMultipart(event)) {
+      await saveDropbox(event.pathParameters.dropboxId, multipart.parse(event));
+    } else {
+      await saveDropbox(
+        event.pathParameters.dropboxId,
+        querystring.parse(event.body)
+      );
+    }
 
-  return {
-    statusCode: 302,
-    headers: { Location: `/dropboxes/${event.pathParameters.dropboxId}` }
-  };
+    return {
+      statusCode: 302,
+      headers: { Location: `/dropboxes/${event.pathParameters.dropboxId}` }
+    };
+  } catch (err) {
+    console.log(err);
+    Sentry.captureException(err);
+    await Sentry.flush();
+  }
 };
 
 module.exports = {
