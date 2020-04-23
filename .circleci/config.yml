@@ -27,8 +27,10 @@ jobs:
 
       - run:
           name: Run tests
+          environment:
+            CYPRESS_JWT_SECRET: my_secret
           command: |
-            echo "/customer-document-uploads/SENTRY_DSN=my_sentry_dsn\n/common/hackney-jwt-secret=my_secret" >> .env
+            echo -e "/customer-document-uploads/SENTRY_DSN=my_sentry_dsn\n/common/hackney-jwt-secret=my_secret" >> .env
             npm run ci
 
       - run:
