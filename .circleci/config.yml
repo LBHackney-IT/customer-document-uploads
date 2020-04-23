@@ -9,18 +9,16 @@ jobs:
     steps:
       - checkout
 
-      - restore_cache:
-          keys:
-            - v1-dependencies-{{ checksum "package-lock.json" }}
+      # - restore_cache:
+      #     keys:
+      #       - v1-dependencies-{{ checksum "package-lock.json" }}
 
       - run:
-          name: Install Serverless CLI, eslint, and dependencies
+          name: Install dependencies
           command: |
-            sudo npm i -g eslint
-            sudo npm i -g serverless
             sudo apt-get update && sudo apt-get install default-jre
             npm install
-            sls dynamodb install
+            ./node_modules/serverless/bin/serverless dynamodb install
             sudo apt-get install libxss1
 
       - run:
@@ -36,13 +34,13 @@ jobs:
       - run:
           name: Set AWS credentials
           command: |
-            sls config credentials --provider aws --key ${AWS_ACCESS_KEY_ID} --secret ${AWS_SECRET_ACCESS_KEY} --profile docuploads
+            ./node_modules/serverless/bin/serverless config credentials --provider aws --key ${AWS_ACCESS_KEY_ID} --secret ${AWS_SECRET_ACCESS_KEY} --profile docuploads
 
-      - save_cache:
-          paths:
-            - node_modules
-          key: v1-dependencies-{{ checksum "package-lock.json" }}
+      # - save_cache:
+      #     paths:
+      #       - node_modules
+      #     key: v1-dependencies-{{ checksum "package-lock.json" }}
 
       - run:
           name: Deploy application
-          command: sls deploy -s production
+          command: ./node_modules/serverless/bin/serverless deploy -s production

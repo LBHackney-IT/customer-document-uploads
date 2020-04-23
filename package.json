@@ -4,15 +4,15 @@
   "description": "A simple tool to enable Hackney residents to upload documents for Hackney staff to view",
   "main": "index.js",
   "scripts": {
-    "start": "sls offline start -s dev",
+    "start": "./node_modules/serverless/bin/serverless offline start -s dev",
     "debug": "node --inspect ./node_modules/serverless/bin/serverless offline -s dev",
-    "dynamo": "sls dynamodb start -s dev",
+    "dynamo": "./node_modules/serverless/bin/serverless dynamodb start -s dev",
     "cypress-ui": "npx cypress open",
-    "test-server": "sls offline start -s test",
+    "test-server": "./node_modules/serverless/bin/serverless offline start -s test",
     "test": "cypress run",
     "ci": "start-server-and-test test-server http://localhost:3000/login test",
-    "deploy": "sls deploy --aws-profile docuploads --stage production",
-    "lint": "eslint --fix --ext js ./*.js && echo 'Lint complete.'"
+    "deploy": "./node_modules/serverless/bin/serverless deploy --aws-profile docuploads --stage production",
+    "lint": "./node_modules/eslint/bin/eslint --fix --ext js ./*.js && echo 'Lint complete.'"
   },
   "repository": {
     "type": "git",
