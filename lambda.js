@@ -150,12 +150,15 @@ api.get('/dropboxes/:dropboxId/files/:fileId', async (req, res) => {
 
 api.post('/dropboxes/:dropboxId/files/:fileId', async (req, res) => {
   const session = getSession(req.headers);
+
   if (session && session.dropboxId === req.params.dropboxId) {
     if (req.body._method === 'DELETE') {
       await deleteDocument(req.params.dropboxId, req.params.fileId);
     }
+
     return res.redirect(`/dropboxes/${req.params.dropboxId}`);
   }
+
   res.sendStatus(404);
 });
 
