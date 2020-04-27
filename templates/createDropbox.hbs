@@ -31,15 +31,15 @@
       {{/each}}
     </ul>
   {{/if }}
-  <form action="" method="POST" enctype="multipart/form-data">
+  <form action="{{ secureUploadUrl }}" method="POST" enctype="multipart/form-data">
     <div class="form-group">
-      <label for="newUploadFile">Select file</label>
-      <input type="file" class="form-control" id="newUploadFile" name="newUploadFile" required />
+      <label for="x-amz-meta-description">File description</label>
+      <input type="text" class="form-control" id="x-amz-meta-description" name="x-amz-meta-description"
+        placeholder='Explain what the document is, eg. "passport scan"' required />
     </div>
     <div class="form-group">
-      <label for="newUploadTitle">File description</label>
-      <input type="text" class="form-control" id="newUploadTitle" name="newUploadTitle"
-        placeholder='Explain what the document is, eg. "passport scan"' required />
+      <label for="file">Select file</label>
+      <input type="file" class="form-control" id="file" name="file" required />
     </div>
     <div class="form-group">
       <button type="submit" id="uploadFile" class="btn btn-block btn-lg btn-primary">Upload Document</button>

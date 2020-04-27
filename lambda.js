@@ -5,7 +5,7 @@ const {
   createEmptyDropbox,
   getDownloadUrl,
   deleteDocument,
-  generateRandomString,
+  getSecureUploadUrl,
   getSession,
   createSessionToken,
   templates,
@@ -94,20 +94,31 @@ api.get('/dropboxes/new', async (req, res) => {
 
 api.get('/dropboxes/:id', async (req, res) => {
   const session = getSession(req.headers);
+
   if (!session || (session && session.dropboxId !== req.params.id)) {
     return res.redirect('/dropboxes/new');
   }
 
-  const dropbox = await getDropbox(req.params.id);
+  const dropboxId = req.params.id;
+  const dropbox = await getDropbox(dropboxId);
+
   if (!dropbox) {
     res.clearCookie('customerToken');
     return res.redirect('/dropboxes/new');
   }
 
-  const params = { dropbox, dropboxId: req.params.id };
+  const params = {
+    dropbox,
+    dropboxId: req.params.id
+  };
+
   const html = dropbox.submitted
     ? templates.readonlyDropboxTemplate(params)
-    : templates.createDropboxTemplate(params);
+    : templates.createDropboxTemplate({
+        ...params,
+        secureUploadUrl: await getSecureUploadUrl(dropboxId)
+      });
+
   res.html(html);
 });
 
