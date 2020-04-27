@@ -10,7 +10,6 @@ const {
   templates,
   authorize
 } = require('./lib/Dependencies');
-const multipart = require('aws-lambda-multipart-parser');
 const querystring = require('querystring');
 const api = require('lambda-api')();
 const Sentry = require('@sentry/node');
@@ -162,38 +161,21 @@ api.post('/dropboxes/:dropboxId/files/:fileId', async (req, res) => {
   res.sendStatus(404);
 });
 
-const isMultipart = event => {
-  const contentType =
-    event.headers['Content-Type'] || event.headers['content-type'];
-  return contentType && contentType.startsWith('multipart/form-data');
-};
-
 const saveDropboxHandler = async event => {
   try {
     const session = getSession(event.headers);
-    if (
-      !session ||
-      (session && session.dropboxId !== event.pathParameters.dropboxId)
-    ) {
+    const { dropboxId: pathDropboxId } = event.pathParameters;
+
+    if (!session || session.dropboxId !== pathDropboxId) {
       return { statusCode: 404 };
     }
 
-    if (event.isBase64Encoded) {
-      event.body = Buffer.from(event.body, 'base64').toString('binary');
-    }
-
-    if (isMultipart(event)) {
-      await saveDropbox(event.pathParameters.dropboxId, multipart.parse(event));
-    } else {
-      await saveDropbox(
-        event.pathParameters.dropboxId,
-        querystring.parse(event.body)
-      );
-    }
+    const { dropboxId } = session;
+    await saveDropbox(dropboxId, querystring.parse(event.body));
 
     return {
       statusCode: 302,
-      headers: { Location: `/dropboxes/${event.pathParameters.dropboxId}` }
+      headers: { Location: `/dropboxes/${dropboxId}` }
     };
   } catch (err) {
     console.log(err);
