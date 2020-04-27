@@ -10,6 +10,7 @@
     "cypress-ui": "npx cypress open",
     "test-server": "./node_modules/serverless/bin/serverless offline start -s test",
     "test": "cypress run",
+    "unit-test": "jest",
     "ci": "start-server-and-test test-server http://localhost:3000/login test",
     "deploy": "./node_modules/serverless/bin/serverless deploy --aws-profile docuploads --stage production",
     "lint": "./node_modules/eslint/bin/eslint.js --fix --ext js ./*.js && echo 'Lint complete.'"
@@ -19,6 +20,9 @@
     "url": "git+https://github.com/LBHackney-IT/customer-document-uploads.git"
   },
   "author": "Ben Pirt and Matthew Millar",
+  "contributors": [
+    "Tom Davies <tom.davies@madetech.com>"
+  ],
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/LBHackney-IT/customer-document-uploads/issues"
@@ -30,7 +34,9 @@
     "cypress-file-upload": "^4.0.4",
     "eslint": "^6.6.0",
     "eslint-config-prettier": "^6.5.0",
+    "eslint-plugin-jest": "^23.8.2",
     "eslint-plugin-prettier": "^3.1.1",
+    "jest": "^25.4.0",
     "prettier": "^1.18.2",
     "serverless": "^1.67.0",
     "serverless-dynamodb-local": "^0.2.39",
