@@ -67,9 +67,7 @@ api.get('/dropboxes', async (req, res) => {
   }
 
   const dropboxes = await getDropboxes({ submitted: true });
-  const html = templates.staffDropboxListTemplate({
-    dropboxes
-  });
+  const html = templates.staffDropboxListTemplate({ dropboxes });
   res.html(html);
 });
 
