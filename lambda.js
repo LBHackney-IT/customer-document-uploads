@@ -85,12 +85,11 @@ api.get('/dropboxes/new', async (req, res) => {
     return res.redirect(`/dropboxes/${session.dropboxId}`);
   }
 
-  const dropboxId = generateRandomString(15);
-  await createEmptyDropbox(dropboxId);
-  res.cookie('customerToken', createSessionToken(dropboxId), {
+  const dropbox = await createEmptyDropbox();
+  res.cookie('customerToken', createSessionToken(dropbox.id), {
     maxAge: 86400 * 30 * 1000
   });
-  res.redirect(`/dropboxes/${dropboxId}`);
+  res.redirect(`/dropboxes/${dropbox.id}`);
 });
 
 api.get('/dropboxes/:id', async (req, res) => {
