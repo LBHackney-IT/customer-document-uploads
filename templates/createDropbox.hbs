@@ -15,11 +15,11 @@
                 {{inc @index}}.
               </div>
               <div class="col-xs-8 col-sm-8 col-md-9 col-lg-9 col-xl-9">
-                <a href="/dropboxes/{{../dropboxId}}/files/{{@key}}" target="_blank">{{this.fileName}}</a>
-                {{#if this.title }} - {{this.title}}{{/if }}
+                <a href="/dropboxes/{{../dropboxId}}/files/{{this.id}}" target="_blank">{{this.id}}</a>
+                {{#if this.description }} - {{this.description}}{{/if }}
               </div>
               <div>
-                <form method="POST" action="/dropboxes/{{ ../dropboxId }}/files/{{ @key }}"
+                <form method="POST" action="/dropboxes/{{ ../dropboxId }}/files/{{ this.id }}"
                   onSubmit="javascript: return confirm('Are you sure you want to delete this document?');">
                   <input type="hidden" name="_method" value="DELETE" />
                   <button class="btn btn-danger">Delete</button>
@@ -32,6 +32,7 @@
     </ul>
   {{/if }}
   <form action="{{ secureUploadUrl }}" method="POST" enctype="multipart/form-data">
+    <input type="hidden" name="success_action_redirect" value="/dropboxes/{{../dropboxId}}" />
     <div class="form-group">
       <label for="x-amz-meta-description">File description</label>
       <input type="text" class="form-control" id="x-amz-meta-description" name="x-amz-meta-description"

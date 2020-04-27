@@ -3,7 +3,6 @@ const {
   saveDropbox,
   getDropboxes,
   createEmptyDropbox,
-  getDownloadUrl,
   deleteDocument,
   getSecureUploadUrl,
   getSession,
@@ -137,19 +136,16 @@ api.get('/dropboxes/:id/view', async (req, res) => {
 });
 
 api.get('/dropboxes/:dropboxId/files/:fileId', async (req, res) => {
-  const dropbox = await getDropbox(req.params.dropboxId);
+  const { dropboxId, fileId } = req.params;
+  const dropbox = await getDropbox(dropboxId);
 
-  const file = dropbox.uploads[req.params.fileId];
+  const file = dropbox.uploads.find(upload => upload.id === fileId);
+
   if (!file) {
     return res.sendStatus(404);
   }
 
-  const signedUrl = await getDownloadUrl(
-    req.params.dropboxId,
-    req.params.fileId,
-    file.fileName
-  );
-  res.redirect(signedUrl);
+  res.redirect(file.downloadUrl);
 });
 
 api.post('/dropboxes/:dropboxId/files/:fileId', async (req, res) => {
