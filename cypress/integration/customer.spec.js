@@ -13,7 +13,8 @@ const dropboxes = require('../../lib/gateways/dropbox/dynamodb')({
 });
 const documents = require('../../lib/gateways/document/s3')({
   ...s3Config,
-  log
+  log,
+  configuration: { urlPrefix: 'http://localhost:3000' }
 });
 require('cypress-file-upload');
 
