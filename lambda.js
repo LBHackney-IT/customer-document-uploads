@@ -103,19 +103,22 @@ api.get('/dropboxes/:id', async (req, res) => {
     return res.redirect('/dropboxes/new');
   }
 
-  const params = {
-    dropbox,
-    dropboxId: req.params.id
-  };
+  const params = { dropbox, dropboxId };
 
-  const html = dropbox.submitted
-    ? templates.readonlyDropboxTemplate(params)
-    : templates.createDropboxTemplate({
-        ...params,
-        secureUploadUrl: await getSecureUploadUrl(dropboxId)
-      });
+  if (dropbox.isSubmitted) {
+    return res.html(templates.readonlyDropboxTemplate(params));
+  }
 
-  res.html(html);
+  const { url, fields, documentId } = await getSecureUploadUrl(dropboxId);
+
+  res.html(
+    templates.createDropboxTemplate({
+      ...params,
+      secureDocumentId: documentId,
+      secureUploadUrl: url,
+      secureUploadFields: fields
+    })
+  );
 });
 
 api.get('/dropboxes/:id/view', async (req, res) => {
