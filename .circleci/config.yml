@@ -31,6 +31,10 @@ jobs:
           command: npm run lint
 
       - run:
+          name: Run unit tests
+          command: npm run unit-test -- --ci
+
+      - run:
           name: Run tests
           environment:
             CYPRESS_JWT_SECRET: my_secret

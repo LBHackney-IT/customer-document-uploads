@@ -10,7 +10,7 @@
     "cypress-ui": "npx cypress open",
     "test-server": "./node_modules/serverless/bin/serverless offline start -s test",
     "test": "cypress run",
-    "unit-test": "jest",
+    "unit-test": "jest --verbose",
     "ci": "start-server-and-test test-server http://localhost:3000/login test",
     "deploy": "./node_modules/serverless/bin/serverless deploy --aws-profile docuploads --stage production",
     "lint": "./node_modules/eslint/bin/eslint.js --fix --ext js ./*.js && echo 'Lint complete.'"
