@@ -59,18 +59,18 @@
     <form action="" method="POST">
       <div class="form-group">
         <label for="customerName">Your name</label>
-        <input type="text" class="form-control" id="customerName" name="customerName" value="{{ dropbox.customerName }}"
+        <input type="text" class="form-control" id="customerName" name="customerName" value="{{ dropbox.customer.name }}"
           required />
       </div>
       <div class="form-group">
         <label for="customerEmail">Email</label>
         <input type="text" class="form-control" id="customerEmail" name="customerEmail"
-          value="{{ dropbox.customerEmail }}" />
+          value="{{ dropbox.customer.email }}" />
       </div>
       <div class="form-group">
         <label for="customerPhone">Phone number</label>
         <input type="text" class="form-control" id="customerPhone" name="customerPhone"
-          value="{{ dropbox.customerPhone }}" />
+          value="{{ dropbox.customer.phone }}" />
       </div>
       <div class="form-group">
         <label for="description">Why are you uploading these documents?</label>

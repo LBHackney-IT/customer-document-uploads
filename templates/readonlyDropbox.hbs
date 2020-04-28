@@ -13,7 +13,7 @@
     <ol>
       {{#each dropbox.uploads }}
         <li>
-          <a href="/dropboxes/{{../dropboxId}}/files/{{this.id}}" target="_blank">{{this.id}}</a>
+          <a href="/dropboxes/{{../dropboxId}}/files/{{this.id}}" target="_blank">{{this.filename}}</a>
           {{#if this.description }} - {{this.description}}{{/if }}
         </li>
       {{/each}}

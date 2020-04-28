@@ -105,7 +105,7 @@ api.get('/dropboxes/:id', async (req, res) => {
 
   const params = { dropbox, dropboxId };
 
-  if (dropbox.isSubmitted) {
+  if (dropbox.submitted) {
     return res.html(templates.readonlyDropboxTemplate(params));
   }
 
