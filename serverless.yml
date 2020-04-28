@@ -27,6 +27,7 @@ provider:
     DROPBOXES_TABLE: '${self:service}-${self:provider.stage}-dropboxes'
     UPLOADS_BUCKET: '${self:service}-${self:provider.stage}-uploads'
     SENTRY_DSN: ${ssm:/customer-document-uploads/SENTRY_DSN}
+    URL_PREFIX: ${self:custom.endpoints.${self:provider.stage}}
     jwtsecret: ${ssm:/common/hackney-jwt-secret}
     stage: ${self:provider.stage}
 
@@ -44,6 +45,10 @@ custom:
     host: localhost
     address: localhost
     allowMismatchedSignatures: true
+  endpoints:
+    dev: http://localhost:3000
+    test: http://localhost:3000
+    prod: https://uploads.hackney.gov.uk
 
 plugins:
   - serverless-offline
