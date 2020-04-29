@@ -164,6 +164,10 @@ api.post('/dropboxes/:dropboxId/files/:fileId', async (req, res) => {
 
 const saveDropboxHandler = async event => {
   try {
+    if (event.isBase64Encoded) {
+      event.body = Buffer.from(event.body, 'base64').toString();
+    }
+
     const session = getSession(event.headers);
     const { dropboxId: pathDropboxId } = event.pathParameters;
 
