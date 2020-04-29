@@ -49,7 +49,7 @@ custom:
   endpoints:
     dev: http://localhost:3000
     test: http://localhost:3000
-    prod: https://uploads.hackney.gov.uk
+    production: https://uploads.hackney.gov.uk
 
 plugins:
   - serverless-offline
