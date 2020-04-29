@@ -8,7 +8,6 @@ provider:
   region: eu-west-2
   apiGateway:
     binaryMediaTypes:
-      - 'multipart/form-data'
       - '*/*'
   iamRoleStatements:
     - Effect: Allow
