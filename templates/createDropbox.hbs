@@ -15,11 +15,11 @@
                 {{inc @index}}.
               </div>
               <div class="col-xs-8 col-sm-8 col-md-9 col-lg-9 col-xl-9">
-                <a href="/dropboxes/{{../dropboxId}}/files/{{@key}}" target="_blank">{{this.fileName}}</a>
-                {{#if this.title }} - {{this.title}}{{/if }}
+                <a href="/dropboxes/{{../dropboxId}}/files/{{this.id}}" target="_blank">{{this.filename}}</a>
+                {{#if this.description }} - {{this.description}}{{/if }}
               </div>
               <div>
-                <form method="POST" action="/dropboxes/{{ ../dropboxId }}/files/{{ @key }}"
+                <form method="POST" action="/dropboxes/{{ ../dropboxId }}/files/{{ this.id }}"
                   onSubmit="javascript: return confirm('Are you sure you want to delete this document?');">
                   <input type="hidden" name="_method" value="DELETE" />
                   <button class="btn btn-danger">Delete</button>
@@ -31,15 +31,18 @@
       {{/each}}
     </ul>
   {{/if }}
-  <form action="" method="POST" enctype="multipart/form-data">
+  <form action="{{ secureUploadUrl }}" method="POST" enctype="multipart/form-data">
     <div class="form-group">
-      <label for="newUploadFile">Select file</label>
-      <input type="file" class="form-control" id="newUploadFile" name="newUploadFile" required />
-    </div>
-    <div class="form-group">
-      <label for="newUploadTitle">File description</label>
-      <input type="text" class="form-control" id="newUploadTitle" name="newUploadTitle"
+      {{#each secureUploadFields}}
+        <input type="hidden" name="{{@key}}" value="{{this}}" />
+      {{/each}}
+      <input type="hidden" name="key" value="{{dropboxId}}/{{secureDocumentId}}/${filename}" />
+      <input type="hidden" name="X-Amz-Server-Side-Encryption" value="AES256" />
+      <label for="x-amz-meta-description">File description</label>
+      <input type="text" class="form-control" id="x-amz-meta-description" name="x-amz-meta-description"
         placeholder='Explain what the document is, eg. "passport scan"' required />
+      <label for="file">Select file</label>
+      <input type="file" class="form-control" id="file" name="file" required />
     </div>
     <div class="form-group">
       <button type="submit" id="uploadFile" class="btn btn-block btn-lg btn-primary">Upload Document</button>
@@ -56,18 +59,18 @@
     <form action="" method="POST">
       <div class="form-group">
         <label for="customerName">Your name</label>
-        <input type="text" class="form-control" id="customerName" name="customerName" value="{{ dropbox.customerName }}"
+        <input type="text" class="form-control" id="customerName" name="customerName" value="{{ dropbox.customer.name }}"
           required />
       </div>
       <div class="form-group">
         <label for="customerEmail">Email</label>
         <input type="text" class="form-control" id="customerEmail" name="customerEmail"
-          value="{{ dropbox.customerEmail }}" />
+          value="{{ dropbox.customer.email }}" />
       </div>
       <div class="form-group">
         <label for="customerPhone">Phone number</label>
         <input type="text" class="form-control" id="customerPhone" name="customerPhone"
-          value="{{ dropbox.customerPhone }}" />
+          value="{{ dropbox.customer.phone }}" />
       </div>
       <div class="form-group">
         <label for="description">Why are you uploading these documents?</label>

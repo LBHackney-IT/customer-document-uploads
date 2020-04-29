@@ -5,7 +5,7 @@
 {{/if }}
 <div id="dropboxContents" data-testid="dropbox-details">
   <strong>Name:</strong>
-  <p>{{ dropbox.customerName }}</p>
+  <p>{{ dropbox.customer.name }}</p>
   <strong>Description:</strong>
   <p>{{ dropbox.description }}</p>
   {{#if dropbox.hasUploads }}
@@ -13,8 +13,8 @@
     <ol>
       {{#each dropbox.uploads }}
         <li>
-          <a href="/dropboxes/{{../dropboxId}}/files/{{@key}}" target="_blank">{{this.fileName}}</a>
-          {{#if this.title }} - {{this.title}}{{/if }}
+          <a href="/dropboxes/{{../dropboxId}}/files/{{this.id}}" target="_blank">{{this.filename}}</a>
+          {{#if this.description }} - {{this.description}}{{/if }}
         </li>
       {{/each}}
     </ol>

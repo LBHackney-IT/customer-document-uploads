@@ -112,3 +112,4 @@ dist
 cypress/examples
 cypress/videos
 cypress/screenshots
+cypress.env.json

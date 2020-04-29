@@ -15,14 +15,14 @@
     {{#each dropboxes}}
       <tr>
         <td scope="row">
-          <a data-testid="dropbox-link" href="/dropboxes/{{this.dropboxId}}/view">
-            {{this.customerName}}
+          <a data-testid="dropbox-link" href="/dropboxes/{{this.id}}/view">
+            {{this.customer.name}}
           </a>
         </td>
         <td>{{this.count}}</td>
         <td>{{this.description}}</td>
-        <td>{{this.customerEmail}}</td>
-        <td>{{this.customerPhone}}</td>
+        <td>{{this.customer.email}}</td>
+        <td>{{this.customer.phone}}</td>
         <td>{{dateFormat this.submitted}}</td>
       </tr>
     {{/each}}
