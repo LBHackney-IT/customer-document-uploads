@@ -161,11 +161,13 @@ context('Customer Actions', () => {
 
       it('should allow a user to add their details and a description and then submit the form', () => {
         const name = 'Homer Simpson';
-        const description = 'These are for my application';
+        const description = 'These are for my app';
 
         cy.get('#customerName').type(name);
+        cy.get('#customerDob').type('1999-12-31');
         cy.get('#customerEmail').type('me@test.com');
         cy.get('#customerPhone').type('123');
+        cy.get('#customerReference').type('222');
         cy.get('#description').type(description);
         cy.get('#submitDropbox').click();
 
