@@ -1,29 +1,33 @@
 {{> header }}
 {{#if isStaff }}
-  <a href="/dropboxes" data-testid="dropbox-list-return-link">
-    << Back to all dropboxes</a>
-{{/if }}
-<div id="dropboxContents" data-testid="dropbox-details">
-  <strong>Name:</strong>
-  <p>{{ dropbox.customer.name }}</p>
-  <strong>Description:</strong>
-  <p>{{ dropbox.description }}</p>
-  {{#if dropbox.hasUploads }}
+<a href="/dropboxes" data-testid="dropbox-list-return-link">
+  << Back to all dropboxes</a> {{/if }} <div id="dropboxContents" data-testid="dropbox-details">
+    <strong>Name:</strong>
+    <p>{{ dropbox.customer.name }}</p>
+    <strong>Reference number:</strong>
+    <p>{{ dropbox.customer.reference }}</p>
+    <strong>Email:</strong>
+    <p>{{ dropbox.customer.email }}</p>
+    <strong>Date of Birth:</strong>
+    <p>{{ dropbox.customer.dob }}</p>
+    <strong>Description:</strong>
+    <p>{{ dropbox.description }}</p>
+    {{#if dropbox.hasUploads }}
     <strong>Uploaded Documents:</strong>
     <ol>
       {{#each dropbox.uploads }}
-        <li>
-          <a href="/dropboxes/{{../dropboxId}}/files/{{this.id}}" target="_blank">{{this.filename}}</a>
-          {{#if this.description }} - {{this.description}}{{/if }}
-        </li>
+      <li>
+        <a href="/dropboxes/{{../dropboxId}}/files/{{this.id}}" target="_blank">{{this.filename}}</a>
+        {{#if this.description }} - {{this.description}}{{/if }}
+      </li>
       {{/each}}
     </ol>
-  {{/if }}
-</div>
-<strong>Submitted on:</strong>
-<p>{{dateFormat dropbox.submitted}}</p>
-{{#if isStaff }}
-{{else}}
-  <a href="/restart" class="btn btn-block btn-lg btn-primary" role="button" id="startAgain">Start Again</a>
-{{/if }}
-{{> footer isStaff }}
+    {{/if }}
+    </div>
+    <strong>Submitted on:</strong>
+    <p>{{dateFormat dropbox.submitted}}</p>
+    {{#if isStaff }}
+    {{else}}
+    <a href="/restart" class="btn btn-block btn-lg btn-primary" role="button" id="startAgain">Start Again</a>
+    {{/if }}
+    {{> footer isStaff }}
