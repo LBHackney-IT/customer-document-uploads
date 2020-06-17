@@ -161,7 +161,7 @@ context('Customer Actions', () => {
 
       it('should allow a user to add their details and a description and then submit the form', () => {
         const name = 'Homer Simpson';
-        const description = 'These are for my app';
+        const description = 'These are for my application';
 
         cy.get('#customerName').type(name);
         cy.get('#customerDob').type('1999-12-31');
