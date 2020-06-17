@@ -34,11 +34,17 @@ context('Staff actions', () => {
       it('shows the customer dropbox details', () => {
         cy.get('[data-testid=staff-dropboxes-list]')
           .children()
-          .first()
+          .eq(2)
           .find('[data-testid=dropbox-link]')
           .click();
 
-        cy.get('[data-testid=dropbox-details]').should('exist');
+        cy.get('[data-testid=dropbox-details]')
+          .should('contain', 'Reference number:')
+          .and('contain', '222')
+          .and('contain', 'Email:')
+          .and('contain', 'me@test.com')
+          .and('contain', 'Date of Birth:')
+          .and('contain', '1999-12-31');
       });
     });
 
