@@ -4,12 +4,14 @@
   << Back to all dropboxes</a> {{/if }} <div id="dropboxContents" data-testid="dropbox-details">
     <strong>Name:</strong>
     <p>{{ dropbox.customer.name }}</p>
-    <strong>Reference number:</strong>
-    <p data-testid="reference-number-value">{{ dropbox.customer.reference }}</p>
     <strong>Email:</strong>
     <p data-testid="email-value">{{ dropbox.customer.email }}</p>
     <strong>Date of Birth:</strong>
     <p data-testid="dob-value">{{ dropbox.customer.dob }}</p>
+    <strong>Benefits claim reference number:</strong>
+    <p data-testid="reference-number-value">{{ dropbox.customer.reference }}</p>
+    <strong>National Insurance number:</strong>
+    <p data-testid="national-insurance-value">{{ dropbox.customer.nationalInsurance }}</p>
     <strong>Description:</strong>
     <p>{{ dropbox.description }}</p>
     {{#if dropbox.hasUploads }}

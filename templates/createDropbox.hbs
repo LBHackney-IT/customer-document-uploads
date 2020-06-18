@@ -63,10 +63,6 @@
         required />
     </div>
     <div class="form-group">
-      <label for="customerDob">Date of birth:</label>
-      <input type="date" class="form-control" id="customerDob" name="customerDob" value="{{ dropbox.customer.dob }}" />
-    </div>
-    <div class="form-group">
       <label for="customerEmail">Email</label>
       <input type="text" class="form-control" id="customerEmail" name="customerEmail"
         value="{{ dropbox.customer.email }}" />
@@ -76,12 +72,24 @@
       <input type="text" class="form-control" id="customerPhone" name="customerPhone"
         value="{{ dropbox.customer.phone }}" />
     </div>
+    <p class='top-border'>
+      Please enter one of the following reference numbers so we can identify you.
+    </p>
     <div class="form-group">
-      <label for="customerReference">Reference number</label>
+      <label for="customerDob">Date of birth:</label>
+      <input type="date" class="form-control" id="customerDob" name="customerDob" value="{{ dropbox.customer.dob }}" />
+    </div>
+    <div class="form-group">
+      <label for="customerReference">Benefits claim reference number</label>
       <input type="text" class="form-control" id="customerReference" name="customerReference"
         value="{{ dropbox.customer.reference }}" />
     </div>
     <div class="form-group">
+      <label for="customerNationalInsurance">National Insurance number</label>
+      <input type="text" class="form-control" id="customerNationalInsurance" name="customerNationalInsurance"
+        value="{{ dropbox.customer.nationalInsurance }}" />
+    </div>
+    <div class="form-group top-border">
       <label for="description">Why are you uploading these documents?</label>
       <textarea class="form-control" id="description" name="description" rows="3"
         placeholder='Give a reason for uploading the documents, eg. "to apply for change of circumstance"'

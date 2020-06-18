@@ -39,13 +39,16 @@ context('Staff actions', () => {
           .click();
 
         cy.get('[data-testid=dropbox-details]')
-          .should('contain', 'Reference number:')
+          .should('contain', 'Benefits claim reference number:')
           .and('contain', 'Email:')
           .and('contain', 'Date of Birth:');
+          .and('contain', 'National Insurance number:');
+
 
         cy.get('[data-testid=reference-number-value]').should('contain', '222');
         cy.get('[data-testid=email-value]').should('contain', 'me@test.com');
         cy.get('[data-testid=dob-value]').should('contain', '1999-12-31');
+        cy.get('[data-testid=national-insurance-value]').should('contain', 'AB111111C');
       });
     });
 
