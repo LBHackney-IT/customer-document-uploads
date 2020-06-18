@@ -5,11 +5,11 @@
     <strong>Name:</strong>
     <p>{{ dropbox.customer.name }}</p>
     <strong>Reference number:</strong>
-    <p>{{ dropbox.customer.reference }}</p>
+    <p data-testid="reference-number-value">{{ dropbox.customer.reference }}</p>
     <strong>Email:</strong>
-    <p>{{ dropbox.customer.email }}</p>
+    <p data-testid="email-value">{{ dropbox.customer.email }}</p>
     <strong>Date of Birth:</strong>
-    <p>{{ dropbox.customer.dob }}</p>
+    <p data-testid="dob-value">{{ dropbox.customer.dob }}</p>
     <strong>Description:</strong>
     <p>{{ dropbox.description }}</p>
     {{#if dropbox.hasUploads }}

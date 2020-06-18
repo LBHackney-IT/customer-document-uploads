@@ -40,11 +40,12 @@ context('Staff actions', () => {
 
         cy.get('[data-testid=dropbox-details]')
           .should('contain', 'Reference number:')
-          .and('contain', '222')
           .and('contain', 'Email:')
-          .and('contain', 'me@test.com')
-          .and('contain', 'Date of Birth:')
-          .and('contain', '1999-12-31');
+          .and('contain', 'Date of Birth:');
+
+        cy.get('[data-testid=reference-number-value]').should('contain', '222');
+        cy.get('[data-testid=email-value]').should('contain', 'me@test.com');
+        cy.get('[data-testid=dob-value]').should('contain', '1999-12-31');
       });
     });
 
