@@ -71,3 +71,12 @@ section {
   border-top: 1px solid lightgrey;
   padding-top: 20px;
 }
+
+#identifiable-fields-warning {
+  color: red;
+  font-weight: bold;
+}
+
+.visually-hidden {
+  display: none;
+}
