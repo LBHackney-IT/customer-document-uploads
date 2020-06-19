@@ -168,6 +168,7 @@ context('Customer Actions', () => {
         cy.get('#customerEmail').type('me@test.com');
         cy.get('#customerPhone').type('123');
         cy.get('#customerReference').type('222');
+        cy.get('#customerNationalInsurance').type('AB111111C');
         cy.get('#description').type(description);
         cy.get('#submitDropbox').click();
 
@@ -202,6 +203,7 @@ context('Customer Actions', () => {
         cy.get('#customerEmail').type('me@test.com');
         cy.get('#customerPhone').type('123');
         cy.get('#description').type('These are for my wedding');
+        cy.get('#customerNationalInsurance').type('AB111111C');
         cy.get('#submitDropbox').click();
       });
 

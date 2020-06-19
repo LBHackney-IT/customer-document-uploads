@@ -66,3 +66,17 @@ section {
   padding: 2px 10px;
   letter-spacing: 0.1em;
 }
+
+.top-border {
+  border-top: 1px solid lightgrey;
+  padding-top: 20px;
+}
+
+#identifiable-fields-warning {
+  color: red;
+  font-weight: bold;
+}
+
+.visually-hidden {
+  display: none;
+}
