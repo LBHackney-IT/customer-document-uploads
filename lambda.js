@@ -4,7 +4,7 @@ const {
   getDropboxes,
   createEmptyDropbox,
   deleteDocument,
-  getSecureUploadUrl,
+  getEvidenceStoreUrl,
   getSession,
   createSessionToken,
   templates,
@@ -109,7 +109,7 @@ api.get('/dropboxes/:id', async (req, res) => {
     return res.html(templates.readonlyDropboxTemplate(params));
   }
 
-  const { url, fields, documentId } = await getSecureUploadUrl(dropboxId);
+  const { url, fields, documentId } = await getEvidenceStoreUrl(dropboxId);
 
   res.html(
     templates.createDropboxTemplate({
