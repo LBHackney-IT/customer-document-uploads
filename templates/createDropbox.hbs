@@ -36,7 +36,7 @@
       {{#each secureUploadFields}}
       <input type="hidden" name="{{@key}}" value="{{this}}" />
       {{/each}}
-      <input type="hidden" name="key" value="{{dropboxId}}/{{secureDocumentId}}/${filename}" />
+      <input type="hidden" name="key" value="{{secureDocumentId}}/${filename}" />
       <input type="hidden" name="X-Amz-Server-Side-Encryption" value="AES256" />
       <label for="x-amz-meta-description">File description</label>
       <input type="text" class="form-control" id="x-amz-meta-description" name="x-amz-meta-description"
