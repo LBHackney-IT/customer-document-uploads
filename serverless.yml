@@ -27,7 +27,6 @@ provider:
     UPLOADS_BUCKET: "${self:service}-${self:provider.stage}-uploads"
     SENTRY_DSN: ${ssm:/customer-document-uploads/SENTRY_DSN}
     URL_PREFIX: ${self:custom.endpoints.${self:provider.stage}}
-    EVIDENCE_STORE_URL: ${self:custom.evidenceStoreUrls.${self:provider.stage}}
     MAX_UPLOAD_BYTES: 20_971_520
     jwtsecret: ${ssm:/common/hackney-jwt-secret}
     CUSTOMER_TOKEN_SECRET: ${ssm:/common/customer-jwt-secret~true}
