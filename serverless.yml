@@ -31,6 +31,8 @@ provider:
     jwtsecret: ${ssm:/common/hackney-jwt-secret}
     CUSTOMER_TOKEN_SECRET: ${ssm:/common/customer-jwt-secret~true}
     stage: ${self:provider.stage}
+    EVIDENCE_STORE_URL: ${self:custom.evidenceStoreUrls.${self:provider.stage}}
+    EVIDENCE_STORE_TOKEN: ${ssm:/customer-document-uploads/evidence-store-token~true}
 
 custom:
   dynamodb:
@@ -50,6 +52,10 @@ custom:
     dev: http://localhost:3000
     test: http://localhost:3000
     production: https://uploads.hackney.gov.uk
+  evidenceStoreUrls:
+    dev: http://localhost:5050
+    test: https://staging-evidence-store.api.hackney.gov.uk
+    production: https://evidence-store.api.hackney.gov.uk
 
 plugins:
   - serverless-offline
