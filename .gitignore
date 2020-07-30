@@ -108,6 +108,7 @@ dist
 
 .s3local
 *.DS_Store
+.idea
 
 cypress/examples
 cypress/videos
