@@ -1,4 +1,5 @@
 const {
+  createDocumentRequest,
   getDropbox,
   saveDropbox,
   getDropboxes,
@@ -160,6 +161,13 @@ api.post('/dropboxes/:dropboxId/files/:fileId', async (req, res) => {
   }
 
   res.sendStatus(404);
+});
+
+api.post('/requests', async (req, res) => {
+  if (!authorize(req)) return res.sendStatus(403);
+  if (!req.body.metadata) return res.sendStatus(400);
+  const docRequest = await createDocumentRequest(req.body.metadata);
+  res.send({ requestId: docRequest.id });
 });
 
 const saveDropboxHandler = async event => {
