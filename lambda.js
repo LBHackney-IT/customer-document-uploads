@@ -1,6 +1,7 @@
 const {
   createDocumentRequest,
   getDocumentRequest,
+  updateDocumentRequest,
   getDropbox,
   saveDropbox,
   getDropboxes,
@@ -118,7 +119,24 @@ api.get('/dropboxes/:id', async (req, res) => {
     return res.html(templates.readonlyDropboxTemplate(params));
   }
 
-  const { url, fields, documentId } = await getEvidenceStoreUrl(dropboxId);
+  let metadata = {};
+  if (req.query.requestId) {
+    const request = await getDocumentRequest(req.query.requestId);
+    if (request) metadata = request.metadata;
+    if (!request.dropboxId) {
+      request.dropboxId = dropboxId;
+      await updateDocumentRequest(request);
+    }
+  }
+
+  const { url, fields, documentId } = await getEvidenceStoreUrl({
+    dropboxId,
+    metadata
+  });
+
+  console.log(documentId);
+  console.log(url);
+  console.log(fields);
 
   res.html(
     templates.createDropboxTemplate({
