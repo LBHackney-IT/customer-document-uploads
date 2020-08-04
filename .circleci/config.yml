@@ -14,10 +14,6 @@ jobs:
     steps:
       - checkout
 
-      # - restore_cache:
-      #     keys:
-      #       - v1-dependencies-{{ checksum "package-lock.json" }}
-
       - run:
           name: Install dependencies
           command: |
@@ -45,22 +41,22 @@ jobs:
       - persist_to_workspace:
           root: ~/repo
           paths: .
-  
+
   deploy:
     executor: node
-
+    parameters:
+      stage_name:
+        type: string
     steps:
       - attach_workspace:
           at: ~/repo
-
       - run:
           name: Set AWS credentials
           command: |
             ./node_modules/serverless/bin/serverless config credentials --provider aws --key ${AWS_ACCESS_KEY_ID} --secret ${AWS_SECRET_ACCESS_KEY} --profile docuploads
-
       - run:
           name: Deploy application
-          command: ./node_modules/serverless/bin/serverless deploy -s production
+          command: ./node_modules/serverless/bin/serverless deploy -s << parameters.stage_name >>
 
 workflows:
   version: 2
@@ -68,9 +64,19 @@ workflows:
     jobs:
       - build
       - deploy:
-          requires:
-            - build
+          name: deploy-staging
+          stage_name: staging
           filters:
             branches:
-              only:
-                - master
+              only: master
+          requires:
+            - build
+      - permit-deploy-production:
+          type: approval
+          requires:
+            - deploy-staging
+      - deploy:
+          name: deploy-production
+          stage_name: production
+          requires:
+            - permit-deploy-production
