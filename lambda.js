@@ -5,6 +5,7 @@ const {
   createEmptyDropbox,
   deleteDocument,
   getEvidenceStoreUrl,
+  getResolvedDownloadUrl,
   getSession,
   createSessionToken,
   templates,
@@ -145,7 +146,8 @@ api.get('/dropboxes/:dropboxId/files/:fileId', async (req, res) => {
     return res.sendStatus(404);
   }
 
-  res.redirect(file.downloadUrl);
+  const downloadUrl = await getResolvedDownloadUrl(file.downloadUrl);
+  res.redirect(downloadUrl);
 });
 
 api.post('/dropboxes/:dropboxId/files/:fileId', async (req, res) => {
