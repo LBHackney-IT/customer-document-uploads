@@ -39,13 +39,13 @@ jobs:
           environment:
             CYPRESS_JWT_SECRET: my_secret
           command: |
-            echo -e "/customer-document-uploads/SENTRY_DSN=my_sentry_dsn\n/common/hackney-jwt-secret=my_secret" >> .env
+            echo -e "/customer-document-uploads/SENTRY_DSN=my_sentry_dsn\n/common/hackney-jwt-secret=my_secret\n/common/customer-jwt-secret=my_secret\n/customer-document-uploads/evidence-store-token=${TEST_ES_TOKEN}" >> .env
             npm run ci
 
       - persist_to_workspace:
           root: ~/repo
           paths: .
-  
+
   deploy:
     executor: node
 
