@@ -8,7 +8,7 @@
     "debug": "node --inspect ./node_modules/serverless/bin/serverless offline -s dev",
     "dynamo": "sls dynamodb start -s dev",
     "dynamo-install": "sls dynamodb install",
-    "cypress-ui": "npx cypress open --env JWT_SECRET=my_secret",
+    "cypress-ui": "npx cypress open",
     "test-server": "sls offline start -s test",
     "test": "cypress run",
     "unit-test": "jest --verbose",
