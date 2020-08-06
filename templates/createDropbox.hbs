@@ -31,7 +31,7 @@
     {{/each}}
   </ul>
   {{/if }}
-  <form action="{{ secureUploadUrl }}" method="POST" enctype="multipart/form-data">
+  <form id="upload" action="{{ secureUploadUrl }}" method="POST" enctype="multipart/form-data">
     <div class="form-group">
       {{#each secureUploadFields}}
       <input type="hidden" name="{{@key}}" value="{{this}}" />
@@ -119,4 +119,30 @@
   </script>
 </section>
 {{/if }}
+<script type="text/javascript">
+  (function () {
+    function doAsyncUpload(event) {
+      event.preventDefault();
+      var form = event.target;
+      var uploadButton = form.querySelector('#uploadFile');
+      uploadButton.disabled = true;
+      uploadButton.innerText = 'Uploading...';
+
+      fetch(form.action, {
+        method: form.method,
+        body: new FormData(form),
+        mode: 'no-cors',
+      }).then(function (data) {
+        window.location.reload();
+      }).catch(function (m) {
+        uploadButton.disabled = false;
+        uploadButton.innerText = 'Upload Document';
+      });
+
+      return false;
+    }
+
+    document.querySelector('#upload').addEventListener('submit', doAsyncUpload);
+  })();
+</script>
 {{> footer isStaff=false }}
