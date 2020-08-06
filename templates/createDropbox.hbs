@@ -133,7 +133,7 @@
         body: new FormData(form),
         mode: 'no-cors',
       }).then(function (data) {
-        window.location.reload();
+        setTimeout(function () { window.location.reload(); }, 2000);
       }).catch(function (m) {
         uploadButton.disabled = false;
         uploadButton.innerText = 'Upload Document';
