@@ -1,21 +1,14 @@
 /// <reference types="cypress" />
-
 process.env.stage = 'test';
 process.env.DROPBOXES_TABLE = 'customer-document-uploads-test-dropboxes';
-process.env.UPLOADS_BUCKET = 'customer-document-uploads-test-uploads';
 const dbConfig = require('../../lib/DynamoDbConfig')(process.env);
 const dbConn = require('../../lib/DynamoDbConnection')(dbConfig);
-const s3Config = require('../../lib/s3Config')(process.env);
 const log = require('../../lib/log')();
 const dropboxes = require('../../lib/gateways/dropbox/dynamodb')({
   ...dbConn,
   log
 });
-const documents = require('../../lib/gateways/document/s3')({
-  ...s3Config,
-  log,
-  configuration: { urlPrefix: 'http://localhost:3000' }
-});
+
 require('cypress-file-upload');
 
 context('Customer Actions', () => {
@@ -26,20 +19,17 @@ context('Customer Actions', () => {
     return await dropboxes.get(dropboxId);
   };
 
-  const getDropboxFiles = async dropbox => {
-    return documents.getByDropboxId(dropbox.id);
-  };
-
-  const uploadAFile = (fileName, description, dropboxId) => {
+  const uploadAndVerifyFile = (fileName, description) => {
     cy.get('#file').attachFile(fileName);
     cy.get('#x-amz-meta-description').type(description);
     cy.get('#uploadFile').click();
 
-    // s3-local doesn't support redirects, so manually refresh instead...
-    cy.visit(`/dropboxes/${dropboxId}`);
+    // work around Cypress not consistently reloading content
+    cy.wait(3000);
+    cy.reload();
 
     cy.get('#uploads')
-      //.should('contain', fileName) s3-local does not correctly set filename
+      .should('contain', fileName)
       .should('contain', description);
   };
 
@@ -107,29 +97,7 @@ context('Customer Actions', () => {
 
       // upload the files and check they are showing in the ui
       files.forEach(file => {
-        uploadAFile(file.filename, file.description);
-      });
-
-      // check the files have been saved correctly
-      cy.location().then(async loc => {
-        const dropbox = await getDropboxFromUrl(loc.pathname);
-        const dropboxFiles = await getDropboxFiles(dropbox);
-
-        const filesFromBucket = [];
-
-        for (const dropboxFile of dropboxFiles) {
-          filesFromBucket.push({
-            filename: dropboxFile.filename,
-            description: dropboxFile.description
-          });
-        }
-
-        // s3-local does not correctly map filenames during upload,
-        // this is safe though as our description is stored in S3 metadata
-        // and so if it is available the file was uploaded successfully.
-        expect(
-          filesFromBucket.map(file => file.description)
-        ).to.have.deep.members(files.map(file => file.description));
+        uploadAndVerifyFile(file.filename, file.description);
       });
     });
 
@@ -156,7 +124,7 @@ context('Customer Actions', () => {
 
     context('when a file has been uploaded', () => {
       beforeEach(() => {
-        uploadAFile('foo.txt', 'this is a foo');
+        uploadAndVerifyFile('foo.txt', 'this is a foo');
       });
 
       it('should allow a user to add their details and a description and then submit the form', () => {
@@ -198,7 +166,7 @@ context('Customer Actions', () => {
 
     context('when a dropbox has been submitted', () => {
       beforeEach(() => {
-        uploadAFile('foo.txt', 'this is a foo');
+        uploadAndVerifyFile('foo.txt', 'this is a foo');
         cy.get('#customerName').type('Jonah Lomu');
         cy.get('#customerEmail').type('me@test.com');
         cy.get('#customerPhone').type('123');

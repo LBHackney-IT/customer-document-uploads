@@ -4,7 +4,8 @@ const {
   getDropboxes,
   createEmptyDropbox,
   deleteDocument,
-  getSecureUploadUrl,
+  getEvidenceStoreUrl,
+  getResolvedDownloadUrl,
   getSession,
   createSessionToken,
   templates,
@@ -115,7 +116,7 @@ api.get('/dropboxes/:id', async (req, res) => {
     return res.html(templates.readonlyDropboxTemplate(params));
   }
 
-  const { url, fields, documentId } = await getSecureUploadUrl(dropboxId);
+  const { url, fields, documentId } = await getEvidenceStoreUrl(dropboxId);
 
   res.html(
     templates.createDropboxTemplate({
@@ -151,7 +152,8 @@ api.get('/dropboxes/:dropboxId/files/:fileId', async (req, res) => {
     return res.sendStatus(404);
   }
 
-  res.redirect(file.downloadUrl);
+  const downloadUrl = await getResolvedDownloadUrl(file.downloadUrl);
+  res.redirect(downloadUrl);
 });
 
 api.post('/dropboxes/:dropboxId/files/:fileId', async (req, res) => {
@@ -159,7 +161,7 @@ api.post('/dropboxes/:dropboxId/files/:fileId', async (req, res) => {
 
   if (session && session.dropboxId === req.params.dropboxId) {
     if (req.body._method === 'DELETE') {
-      await deleteDocument(req.params.dropboxId, req.params.fileId);
+      await deleteDocument(req.params.fileId);
     }
 
     return res.redirect(`/dropboxes/${req.params.dropboxId}`);
