@@ -20,6 +20,9 @@ footer {
   background-color: #00513f;
   text-align: center;
 }
+.btn-danger {
+  color: black !important;
+}
 
 footer a,
 footer a:hover {
@@ -56,6 +59,12 @@ section {
   background-color: #fcf8e3;
   padding: 10px 0;
   font-size: 0.9em;
+}
+.feedback_form,
+.file-link,
+.name-link {
+  text-decoration: underline;
+  color: black;
 }
 
 .banner-tag {
