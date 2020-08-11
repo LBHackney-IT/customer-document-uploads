@@ -55,3 +55,12 @@ You can run Cypress tests using this command:
 npm run cypress-ui # for dev and debugging, or
 npm test # full test run (e.g. in CI)
 ```
+
+## Deployment
+After committing CircleCI will automatically build and test your changes,
+this runs all unit and integration tests. The results of these tests will
+be reported in your PR and alongside the commit in GitHub.
+
+After merging into `master` CircleCI will deploy the application to a staging
+environment, there is a manual approval step for deploying to production.
+Manual approval can be provided in CircleCI.
