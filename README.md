@@ -1,5 +1,5 @@
 # customer-document-uploads
-A simple tool to enable Hackney residents to upload documents for Hackney staff to view
+A simple tool to enable Hackney residents to upload documents for Hackney staff to view.
 
 ## Initial setup
 Once you've cloned this repository, you'll need a few things to get up and
@@ -25,10 +25,17 @@ running locally.
 ## Running locally
 Once you're all set up you can run the application locally, it should start up 
 at http://localhost:3000. This will be running using a local version of
-DynamoDB and S3.
+DynamoDB and the staging instance of Evidence Store (this is configurable in
+the `serverless.yml` file).
 
 ```bash
 npm run start
+```
+
+## Unit tests
+To run the unit tests (using Jest):
+```bash
+npm run unit-test
 ```
 
 ## Cypress tests
@@ -38,6 +45,13 @@ variables. If you're using a JSON file it should look something like this:
 
 ```
 {
-    "JWT_SECRET": "{{ value of your token secret from .env }}"
+    "JWT_SECRET": "{{ value of your token secret from .env }}",
+    "TEST_ES_TOKEN": "{{ valid Hackney token for Evidence Store }}
 }
+```
+
+You can run Cypress tests using this command:
+```bash
+npm run cypress-ui # for dev and debugging, or
+npm test # full test run (e.g. in CI)
 ```
