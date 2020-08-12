@@ -44,7 +44,6 @@
     "serverless-dynamodb-local": "^0.2.39",
     "serverless-offline": "^5.12.1",
     "serverless-offline-ssm": "^4.1.2",
-    "serverless-s3-local": "^0.5.4",
     "start-server-and-test": "^1.10.11"
   },
   "dependencies": {
