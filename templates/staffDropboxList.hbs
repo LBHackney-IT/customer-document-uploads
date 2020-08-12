@@ -1,37 +1,97 @@
 {{> header }}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" />
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
 <h2>Customer Uploads</h2>
-<table class="table table-striped">
-  <thead>
-    <tr>
-      <th scope="col">Name</th>
-      <th scope="col">Docs</th>
-      <th scope="col">Upload Reason</th>
-      <th scope="col">Email</th>
-      <th scope="col">Date of Birth</th>
-      <th scope="col">National Insurance Number</th>
-      <th scope="col">Phone</th>
-      <th scope="col">Reference</th>
-      <th scope="col">Submitted</th>
-    </tr>
-  </thead>
-  <tbody data-testid="staff-dropboxes-list">
-    {{#each dropboxes}}
-    <tr>
-      <td scope="row">
-        <a data-testid="dropbox-link" href="/dropboxes/{{this.id}}/view">
-          {{this.customer.name}}
-        </a>
-      </td>
-      <td>{{this.count}}</td>
-      <td>{{this.description}}</td>
-      <td>{{this.customer.email}}</td>
-      <td>{{this.customer.dob}}</td>
-      <td>{{this.customer.nationalInsurance}}</td>
-      <td>{{this.customer.phone}}</td>
-      <td>{{this.customer.reference}}</td>
-      <td>{{dateFormat this.submitted}}</td>
-    </tr>
-    {{/each}}
-  </tbody>
-</table>
+
+<ul class="nav nav-tabs">
+  <li class="active"><a href="#dropboxes-to-review" data-toggle="tab">Dropboxes to review ({{dropboxes.length}})</a>
+  </li>
+  <li><a href="#archived-dropboxes" data-toggle="tab">Archived dropboxes</a></li>
+</ul>
+
+<div class="tab-content">
+  <div class="tab-pane active" id="dropboxes-to-review">
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th scope="col">Name</th>
+          <th scope="col">Docs</th>
+          <th scope="col">Upload Reason</th>
+          <th scope="col">Email</th>
+          <th scope="col">Date of Birth</th>
+          <th scope="col">National Insurance Number</th>
+          <th scope="col">Phone</th>
+          <th scope="col">Reference</th>
+          <th scope="col">Submitted</th>
+        </tr>
+      </thead>
+      <tbody data-testid="staff-dropboxes-list">
+        {{#each dropboxes}}
+        {{#unless this.archived}}
+        <tr>
+          <td scope="row">
+            <a data-testid="dropbox-link" href="/dropboxes/{{this.id}}/view">
+              {{this.customer.name}}
+            </a>
+          </td>
+          <td>{{this.count}}</td>
+          <td>{{this.description}}</td>
+          <td>{{this.customer.email}}</td>
+          <td>{{this.customer.dob}}</td>
+          <td>{{this.customer.nationalInsurance}}</td>
+          <td>{{this.customer.phone}}</td>
+          <td>{{this.customer.reference}}</td>
+          <td>{{dateFormat this.submitted}}</td>
+        </tr>
+        {{/unless}}
+        {{/each}}
+      </tbody>
+    </table>
+  </div>
+  <div class="tab-pane" id="archived-dropboxes">
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th scope="col">Name</th>
+          <th scope="col">Docs</th>
+          <th scope="col">Upload Reason</th>
+          <th scope="col">Email</th>
+          <th scope="col">Date of Birth</th>
+          <th scope="col">National Insurance Number</th>
+          <th scope="col">Phone</th>
+          <th scope="col">Reference</th>
+          <th scope="col">Submitted</th>
+        </tr>
+      </thead>
+      <tbody data-testid="staff-dropboxes-list">
+        {{#each dropboxes}}
+        {{#if this.archived}}
+        <tr>
+          <td scope="row">
+            <a data-testid="dropbox-link" href="/dropboxes/{{this.id}}/view">
+              {{this.customer.name}}
+            </a>
+          </td>
+          <td>{{this.count}}</td>
+          <td>{{this.description}}</td>
+          <td>{{this.customer.email}}</td>
+          <td>{{this.customer.dob}}</td>
+          <td>{{this.customer.nationalInsurance}}</td>
+          <td>{{this.customer.phone}}</td>
+          <td>{{this.customer.reference}}</td>
+          <td>{{dateFormat this.submitted}}</td>
+        </tr>
+        {{/if}}
+        {{/each}}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+</div>
+
+
+
 {{> footer isStaff=true }}
