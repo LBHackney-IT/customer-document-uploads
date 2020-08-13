@@ -61,8 +61,15 @@
           })
         }
 
-        document.querySelector('#archive') ? document.querySelector('#archive').addEventListener('click', function (event) { doArchive(event, true); }) : null;
-        document.querySelector('#unarchive') ? document.querySelector('#unarchive').addEventListener('click', function (event) { doArchive(event, false); }) : null;
+        function tryAddEventListener(selector, event, handler) {
+          const element = document.querySelector(selector);
+          if (element) {
+            element.addEventListener(event, handler);
+          }
+        }
+
+        tryAddEventListener('#archive', 'click', function (event) { doArchive(event, true); })
+        tryAddEventListener('#unarchive', 'click', function (event) { doArchive(event, false); })
       })();
     </script>
     {{> footer isStaff }}

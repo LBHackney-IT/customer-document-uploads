@@ -130,12 +130,9 @@ api.get('/dropboxes/:id', async (req, res) => {
 });
 
 api.post('/dropboxes/:id/archive', async (req, res) => {
-  const { archiveStatus } = req.body;
-  const dropboxId = req.params.id;
-  console.log(archiveStatus, dropboxId);
   const response = await updateArchiveStatus({
     dropboxId: req.params.id,
-    archiveStatus
+    archiveStatus: req.body.archiveStatus
   });
 
   res.json({ response });
