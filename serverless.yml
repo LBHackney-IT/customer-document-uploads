@@ -43,26 +43,21 @@ custom:
       port: 8000
       inMemory: true
       migrate: true
-  s3:
-    port: 8100
-    directory: ./.s3local
-    host: localhost
-    address: localhost
-    allowMismatchedSignatures: true
   endpoints:
     dev: http://localhost:3000
     test: http://localhost:3000
+    staging: https://staging.uploads.hackney.gov.uk
     production: https://uploads.hackney.gov.uk
   evidenceStoreUrls:
     dev: http://localhost:5050
     test: https://staging-evidence-store.api.hackney.gov.uk
+    staging: https://staging-evidence-store.api.hackney.gov.uk
     production: https://evidence-store.api.hackney.gov.uk
 
 plugins:
   - serverless-offline
   - serverless-offline-ssm
   - serverless-dynamodb-local
-  - serverless-s3-local
 
 package:
   individually: true

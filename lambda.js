@@ -8,6 +8,7 @@ const {
   createEmptyDropbox,
   deleteDocument,
   getEvidenceStoreUrl,
+  getResolvedDownloadUrl,
   getSession,
   createSessionToken,
   templates,
@@ -42,6 +43,12 @@ api.get('/img/:filename', async (req, res) => {
   });
 });
 
+api.get('/js/:filename', async (req, res) => {
+  res.sendFile(req.params.filename, {
+    root: 'static/js/'
+  });
+});
+
 api.use(async (req, res, next) => {
   console.log(`REQUEST: { method: ${req.method}, path: ${req.path} }`);
   next();
@@ -49,7 +56,7 @@ api.use(async (req, res, next) => {
 
 api.get('/login', async (req, res) => {
   const html = templates.loginTemplate();
-  res.html(html);
+  return res.html(html);
 });
 
 api.get('/logout', async (req, res) => {
@@ -134,10 +141,6 @@ api.get('/dropboxes/:id', async (req, res) => {
     metadata
   });
 
-  console.log(documentId);
-  console.log(url);
-  console.log(fields);
-
   res.html(
     templates.createDropboxTemplate({
       ...params,
@@ -172,7 +175,8 @@ api.get('/dropboxes/:dropboxId/files/:fileId', async (req, res) => {
     return res.sendStatus(404);
   }
 
-  res.redirect(file.downloadUrl);
+  const downloadUrl = await getResolvedDownloadUrl(file.downloadUrl);
+  res.redirect(downloadUrl);
 });
 
 api.post('/dropboxes/:dropboxId/files/:fileId', async (req, res) => {
@@ -180,7 +184,7 @@ api.post('/dropboxes/:dropboxId/files/:fileId', async (req, res) => {
 
   if (session && session.dropboxId === req.params.dropboxId) {
     if (req.body._method === 'DELETE') {
-      await deleteDocument(req.params.dropboxId, req.params.fileId);
+      await deleteDocument(req.params.fileId);
     }
 
     return res.redirect(`/dropboxes/${req.params.dropboxId}`);
