@@ -1,6 +1,5 @@
 jest.mock('./lib/Dependencies');
 const {
-  authorize,
   getDropbox,
   getEvidenceStoreUrl,
   getSession,
@@ -21,13 +20,6 @@ describe('handler routes', () => {
     it('shows the login page if not logged in', async () => {
       await handler(evt('GET', '/login'), {});
       expect(templates.loginTemplate).toHaveBeenCalled();
-    });
-
-    it('redirects to the dropboxes page if logged in', async () => {
-      authorize.mockImplementationOnce(() => true);
-      const res = await handler(evt('GET', '/login'));
-      expect(res.statusCode).toBe(302);
-      expect(res.headers.location).toBe('/dropboxes');
     });
   });
 
