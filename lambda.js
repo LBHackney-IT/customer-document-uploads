@@ -196,7 +196,6 @@ api.post('/dropboxes/:dropboxId/files/:fileId', async (req, res) => {
     if (req.body._method === 'DELETE') {
       await deleteDocument(req.params.fileId);
     }
-
     return res.redirect(`/dropboxes/${req.params.dropboxId}`);
   }
 
