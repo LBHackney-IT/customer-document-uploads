@@ -42,12 +42,6 @@ custom:
       port: 8000
       inMemory: true
       migrate: true
-  s3:
-    port: 8100
-    directory: ./.s3local
-    host: localhost
-    address: localhost
-    allowMismatchedSignatures: true
   endpoints:
     dev: http://localhost:3000
     test: http://localhost:3000
@@ -63,7 +57,6 @@ plugins:
   - serverless-offline
   - serverless-offline-ssm
   - serverless-dynamodb-local
-  - serverless-s3-local
 
 package:
   individually: true
