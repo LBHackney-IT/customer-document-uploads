@@ -54,7 +54,7 @@ api.use(async (req, res, next) => {
 
 api.get('/login', async (req, res) => {
   const html = templates.loginTemplate();
-  res.html(html);
+  return res.html(html);
 });
 
 api.get('/logout', async (req, res) => {
