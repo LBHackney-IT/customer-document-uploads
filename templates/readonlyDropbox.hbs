@@ -29,7 +29,47 @@
     <strong>Submitted on:</strong>
     <p>{{dateFormat dropbox.submitted}}</p>
     {{#if isStaff }}
+    {{#if dropbox.archived}}
+    <strong>
+      <p data-testid="archive-status-test">Status: Archived </p>
+    </strong>
+    <button id="unarchive" data-testid="unarchive-button-test" type="button" class="btn btn-light"
+      data-dropboxid="{{ dropboxId }}">Unarchive</button>
+    {{else}}
+    <strong>
+      <p data-testid="archive-status-test">Status: To review</p>
+    </strong>
+    <button id="archive" data-testid="archive-button-test" type="button" class="btn btn-light"
+      data-dropboxid="{{ dropboxId }}">Move to archive</button>
+    {{/if}}
+
     {{else}}
     <a href="/restart" class="btn btn-block btn-lg btn-primary" role="button" id="startAgain">Start Again</a>
     {{/if }}
+
+    <script type="text/javascript">
+      (function () {
+
+        function doArchive(event, archiveStatus) {
+          const dropboxId = event.target.getAttribute('data-dropboxid');
+          fetch(`/dropboxes/${dropboxId}/archive`, {
+            method: 'POST',
+            body: JSON.stringify({ archiveStatus }),
+            mode: 'no-cors'
+          }).then(function () {
+            window.location.reload();
+          })
+        }
+
+        function tryAddEventListener(selector, event, handler) {
+          const element = document.querySelector(selector);
+          if (element) {
+            element.addEventListener(event, handler);
+          }
+        }
+
+        tryAddEventListener('#archive', 'click', function (event) { doArchive(event, true); })
+        tryAddEventListener('#unarchive', 'click', function (event) { doArchive(event, false); })
+      })();
+    </script>
     {{> footer isStaff }}
