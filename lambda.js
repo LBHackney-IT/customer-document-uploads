@@ -9,7 +9,8 @@ const {
   getSession,
   createSessionToken,
   templates,
-  authorize
+  authorize,
+  updateArchiveStatus
 } = require('./lib/Dependencies');
 const querystring = require('querystring');
 const api = require('lambda-api')();
@@ -126,6 +127,15 @@ api.get('/dropboxes/:id', async (req, res) => {
       secureUploadFields: fields
     })
   );
+});
+
+api.post('/dropboxes/:id/archive', async (req, res) => {
+  const response = await updateArchiveStatus({
+    dropboxId: req.params.id,
+    archiveStatus: req.body.archiveStatus
+  });
+
+  res.json({ response });
 });
 
 api.get('/dropboxes/:id/view', async (req, res) => {
