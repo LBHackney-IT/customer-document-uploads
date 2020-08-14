@@ -70,6 +70,11 @@ context('Staff actions', () => {
 
     context('archive/unarchive functionality', () => {
       it('can archive a dropbox', () => {
+        cy.get('[data-testid=dropboxes-to-review-test]').should(
+          'contain',
+          '(3)'
+        );
+
         cy.get('[data-testid=staff-dropboxes-list]')
           .children()
           .eq(2)
@@ -86,6 +91,13 @@ context('Staff actions', () => {
         cy.get('[data-testid=archive-status-test]').should(
           'contain',
           'Status: Archived'
+        );
+
+        cy.get('[data-testid=dropbox-list-return-link]').click();
+
+        cy.get('[data-testid=dropboxes-to-review-test]').should(
+          'contain',
+          '(2)'
         );
       });
     });

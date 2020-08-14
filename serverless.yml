@@ -24,6 +24,7 @@ provider:
       Resource: '*'
   environment:
     DROPBOXES_TABLE: '${self:service}-${self:provider.stage}-dropboxes'
+    REQUESTS_TABLE: '${self:service}-${self:provider.stage}-requests'
     UPLOADS_BUCKET: '${self:service}-${self:provider.stage}-uploads'
     SENTRY_DSN: ${ssm:/customer-document-uploads/SENTRY_DSN}
     URL_PREFIX: ${self:custom.endpoints.${self:provider.stage}}
@@ -132,3 +133,20 @@ resources:
         StreamSpecification:
           StreamViewType: NEW_AND_OLD_IMAGES
         TableName: ${self:provider.environment.DROPBOXES_TABLE}
+    RequestsDynamoDbTable:
+      Type: 'AWS::DynamoDB::Table'
+      DeletionPolicy: Retain
+      Properties:
+        AttributeDefinitions:
+          - AttributeName: requestId
+            AttributeType: S
+        KeySchema:
+          - AttributeName: requestId
+            KeyType: HASH
+        BillingMode: PROVISIONED
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        StreamSpecification:
+          StreamViewType: NEW_AND_OLD_IMAGES
+        TableName: ${self:provider.environment.REQUESTS_TABLE}

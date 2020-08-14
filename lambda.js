@@ -1,4 +1,7 @@
 const {
+  createDocumentRequest,
+  getDocumentRequest,
+  updateDocumentRequest,
   getDropbox,
   saveDropbox,
   getDropboxes,
@@ -85,16 +88,23 @@ api.get('/dropboxes/new', async (req, res) => {
     return res.redirect('/dropboxes');
   }
 
-  const session = getSession(req.headers);
-  if (session && session.dropboxId) {
-    return res.redirect(`/dropboxes/${session.dropboxId}`);
+  if (!req.query.requestId) {
+    const session = getSession(req.headers);
+    if (session && session.dropboxId) {
+      return res.redirect(`/dropboxes/${session.dropboxId}`);
+    }
   }
 
   const dropbox = await createEmptyDropbox();
   res.cookie('customerToken', createSessionToken(dropbox.id), {
     maxAge: 86400 * 30 * 1000
   });
-  res.redirect(`/dropboxes/${dropbox.id}`);
+
+  res.redirect(
+    `/dropboxes/${dropbox.id}${
+      req.query.requestId ? `?requestId=${req.query.requestId}` : ''
+    }`
+  );
 });
 
 api.get('/dropboxes/:id', async (req, res) => {
@@ -118,7 +128,20 @@ api.get('/dropboxes/:id', async (req, res) => {
     return res.html(templates.readonlyDropboxTemplate(params));
   }
 
-  const { url, fields, documentId } = await getEvidenceStoreUrl(dropboxId);
+  let metadata = {};
+  if (req.query.requestId) {
+    const request = await getDocumentRequest(req.query.requestId);
+    if (request) metadata = request.metadata;
+    if (!request.dropboxId) {
+      request.dropboxId = dropboxId;
+      await updateDocumentRequest(request);
+    }
+  }
+
+  const { url, fields, documentId } = await getEvidenceStoreUrl({
+    dropboxId,
+    metadata
+  });
 
   res.html(
     templates.createDropboxTemplate({
@@ -174,7 +197,6 @@ api.post('/dropboxes/:dropboxId/files/:fileId', async (req, res) => {
     if (req.body._method === 'DELETE') {
       await deleteDocument(req.params.fileId);
     }
-
     return res.redirect(`/dropboxes/${req.params.dropboxId}`);
   }
 
@@ -186,6 +208,20 @@ api.post('/dropboxes/:dropboxId/notification', async (req, res) => {
     dropboxId: req.params.id
   });
   res.json({ response });
+});
+
+api.post('/requests', async (req, res) => {
+  if (!authorize(req)) return res.sendStatus(403);
+  if (!req.body.metadata) return res.sendStatus(400);
+  const docRequest = await createDocumentRequest(req.body.metadata);
+  res.send({ requestId: docRequest.id });
+});
+
+api.get('/requests/:requestId', async (req, res) => {
+  const request = await getDocumentRequest(req.params.requestId);
+  if (!request) return res.sendStatus(404);
+  if (request.dropboxId) return res.redirect(`/dropboxes/${request.dropboxId}`);
+  return res.redirect(`/dropboxes/new?requestId=${request.id}`);
 });
 
 const saveDropboxHandler = async event => {
