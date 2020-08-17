@@ -30,7 +30,7 @@ const evt = (method, path, body, query) => {
 };
 
 describe('handler routes', () => {
-  const handler = require('./lambda').handler;
+  const handler = require('./lambda').appHandler;
 
   describe('GET /login', () => {
     it('shows the login page if not logged in', async () => {
@@ -107,6 +107,7 @@ describe('handler routes', () => {
       const metadata = { name: 'Matt' };
       const res = await handler(evt('POST', '/requests', { metadata }));
       expect(createDocumentRequest).toHaveBeenCalledWith(metadata);
+      expect(JSON.parse(res.statusCode)).toEqual(201);
       expect(JSON.parse(res.body).requestId).toEqual('1');
     });
 

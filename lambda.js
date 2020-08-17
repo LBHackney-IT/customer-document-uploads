@@ -18,6 +18,8 @@ const {
 const querystring = require('querystring');
 const api = require('lambda-api')();
 const Sentry = require('@sentry/node');
+const fs = require('fs');
+var mime = require('mime-types');
 
 if (process.env.stage === 'production') {
   Sentry.init({
@@ -32,22 +34,11 @@ if (process.env.stage === 'production') {
   });
 }
 
-api.get('/css/:filename', async (req, res) => {
-  res.sendFile(req.params.filename, {
-    root: 'static/css/'
-  });
-});
-
-api.get('/img/:filename', async (req, res) => {
-  res.sendFile(req.params.filename, {
-    root: 'static/img/'
-  });
-});
-
-api.get('/js/:filename', async (req, res) => {
-  res.sendFile(req.params.filename, {
-    root: 'static/js/'
-  });
+api.get('/assets/:folder/:filename', async (req, res) => {
+  const filePath = `${__dirname}/static/${req.params.folder}/${req.params.filename}`;
+  const contentType = mime.lookup(filePath);
+  const data = fs.readFileSync(filePath);
+  res.header('Content-Type', contentType).send(data.toString());
 });
 
 api.use(async (req, res, next) => {
@@ -206,7 +197,11 @@ api.post('/requests', async (req, res) => {
   if (!authorize(req)) return res.sendStatus(403);
   if (!req.body.metadata) return res.sendStatus(400);
   const docRequest = await createDocumentRequest(req.body.metadata);
-  res.send({ requestId: docRequest.id });
+  res
+    .header('Access-Control-Allow-Origin', '*')
+    .header('Access-Control-Allow-Credentials', true)
+    .status(201)
+    .json({ requestId: docRequest.id });
 });
 
 api.get('/requests/:requestId', async (req, res) => {
@@ -244,7 +239,7 @@ const saveDropboxHandler = async event => {
 };
 
 module.exports = {
-  handler: async (event, context) => {
+  appHandler: async (event, context) => {
     return await api.run(event, context);
   },
   saveDropboxHandler

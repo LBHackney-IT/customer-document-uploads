@@ -6,9 +6,6 @@ provider:
   memorySize: 256
   stage: ${opt:stage, 'dev'}
   region: eu-west-2
-  apiGateway:
-    binaryMediaTypes:
-      - '*/*'
   iamRoleStatements:
     - Effect: Allow
       Action:
@@ -88,7 +85,7 @@ functions:
           path: '/dropboxes/{dropboxId}'
           method: POST
   app:
-    handler: lambda.handler
+    handler: lambda.appHandler
     package:
       include:
         - lambda.js
@@ -97,8 +94,16 @@ functions:
         - templates/**
         - node_modules/**
     events:
+      - http: GET /
       - http:
-          path: '{proxy+}'
+          path: /assets/{proxy+}
+          method: GET
+      - http:
+          path: /requests
+          method: POST
+          cors: true
+      - http:
+          path: /{proxy+}
           method: ANY
 
 resources:
