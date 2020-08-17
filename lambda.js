@@ -78,10 +78,9 @@ api.get('/dropboxes', async (req, res) => {
 });
 
 api.get('/dropboxes/new', async (req, res) => {
-  if (authorize(req)) {
-    return res.redirect('/dropboxes');
-  }
+  if (authorize(req)) return res.redirect('/dropboxes');
 
+  console.log(`/dropboxes/new requestId: ${req.query.requestId}`);
   if (!req.query.requestId) {
     const session = getSession(req.headers);
     if (session && session.dropboxId) {
@@ -123,6 +122,7 @@ api.get('/dropboxes/:id', async (req, res) => {
   }
 
   let metadata = {};
+  console.log(`/dropboxes/${dropboxId} requestId: ${req.query.requestId}`);
   if (req.query.requestId) {
     const request = await getDocumentRequest(req.query.requestId);
     if (request) metadata = request.metadata;
@@ -209,6 +209,7 @@ api.post('/requests', async (req, res) => {
 });
 
 api.get('/requests/:requestId', async (req, res) => {
+  if (authorize(req)) return res.redirect('/dropboxes');
   const request = await getDocumentRequest(req.params.requestId);
   if (!request) return res.sendStatus(404);
   if (request.dropboxId) return res.redirect(`/dropboxes/${request.dropboxId}`);

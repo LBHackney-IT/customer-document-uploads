@@ -125,6 +125,13 @@ describe('handler routes', () => {
   });
 
   describe('GET /requests/:requestId', () => {
+    it('redirects to staff view if logged in', async () => {
+      authorize.mockImplementationOnce(() => true);
+      const res = await handler(evt('GET', '/requests/1'));
+      expect(res.statusCode).toEqual(302);
+      expect(res.headers.location).toBe('/dropboxes');
+    });
+
     it('returns not found if it does not exist', async () => {
       getDocumentRequest.mockImplementationOnce(() => null);
       const res = await handler(evt('GET', '/requests/1'));
