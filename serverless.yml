@@ -62,15 +62,6 @@ package:
     - ./**
 
 functions:
-  root:
-    handler: root.handler
-    package:
-      include:
-        - root.js
-    events:
-      - http:
-          path: /
-          method: GET
   saveDropbox:
     handler: lambda.saveDropboxHandler
     package:

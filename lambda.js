@@ -46,6 +46,10 @@ api.use(async (req, res, next) => {
   next();
 });
 
+api.get('/', async (req, res) => {
+  res.redirect('/dropboxes/new');
+});
+
 api.get('/login', async (req, res) => {
   const html = templates.loginTemplate();
   return res.html(html);
