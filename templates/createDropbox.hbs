@@ -131,11 +131,6 @@
         method: form.method,
         body: new FormData(form),
         mode: 'no-cors',
-      }).then(function (data) {
-        fetch('/dropboxes/{{dropboxId}}/notification', {
-          method: 'POST',
-          body: {}
-        })
       }).then(function () {
         setTimeout(function () { window.location.reload(); }, 3000);
       })

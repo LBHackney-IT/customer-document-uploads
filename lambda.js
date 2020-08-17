@@ -203,13 +203,6 @@ api.post('/dropboxes/:dropboxId/files/:fileId', async (req, res) => {
   res.sendStatus(404);
 });
 
-api.post('/dropboxes/:dropboxId/notification', async (req, res) => {
-  const response = await sendNotification({
-    dropboxId: req.params.id
-  });
-  res.json({ response });
-});
-
 api.post('/requests', async (req, res) => {
   if (!authorize(req)) return res.sendStatus(403);
   if (!req.body.metadata) return res.sendStatus(400);
@@ -239,6 +232,10 @@ const saveDropboxHandler = async event => {
 
     const { dropboxId } = session;
     await saveDropbox(dropboxId, querystring.parse(event.body));
+
+    await sendNotification({
+      dropboxId
+    });
 
     return {
       statusCode: 302,
