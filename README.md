@@ -33,6 +33,12 @@ npm run start
 ```
 
 ## Unit tests
+Set these values in .env to any string values
+```bash
+GOV_NOTIFY_API_KEY=
+GOV_NOTIFY_TEMPLATE_ID=
+```
+
 To run the unit tests (using Jest):
 ```bash
 npm run unit-test
