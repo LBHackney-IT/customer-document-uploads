@@ -16,7 +16,6 @@ const {
   updateArchiveStatus,
   sendNotification
 } = require('./lib/Dependencies');
-const querystring = require('querystring');
 const api = require('lambda-api')();
 const Sentry = require('@sentry/node');
 const fs = require('fs');
@@ -96,7 +95,7 @@ api.get('/dropboxes/new', async (req, res) => {
 
   res.redirect(
     `/dropboxes/${dropbox.id}${
-      req.query.requestId ? `?requestId=${req.query.requestId}` : ''
+    req.query.requestId ? `?requestId=${req.query.requestId}` : ''
     }`
   );
 });
@@ -217,40 +216,23 @@ api.get('/requests/:requestId', async (req, res) => {
   return res.redirect(`/dropboxes/new?requestId=${request.id}`);
 });
 
-const saveDropboxHandler = async event => {
-  try {
-    if (event.isBase64Encoded) {
-      event.body = Buffer.from(event.body, 'base64').toString();
-    }
+api.post('/dropboxes/:dropboxId', async (req, res) => {
+  const session = getSession(req.headers);
+  const { dropboxId: pathDropboxId } = req.params;
 
-    const session = getSession(event.headers);
-    const { dropboxId: pathDropboxId } = event.pathParameters;
-
-    if (!session || session.dropboxId !== pathDropboxId) {
-      return { statusCode: 404 };
-    }
-
-    const { dropboxId } = session;
-    await saveDropbox(dropboxId, querystring.parse(event.body));
-
-    await sendNotification({
-      dropboxId
-    });
-
-    return {
-      statusCode: 302,
-      headers: { Location: `/dropboxes/${dropboxId}` }
-    };
-  } catch (err) {
-    console.log(err);
-    Sentry.captureException(err);
-    await Sentry.flush();
+  if (!session || session.dropboxId !== pathDropboxId) {
+    return res.sendStatus(404);
   }
-};
+
+  const { dropboxId } = session;
+  await saveDropbox(dropboxId, req.body);
+
+  await sendNotification({ dropboxId });
+  return res.redirect(`/dropboxes/${dropboxId}`);
+});
 
 module.exports = {
   appHandler: async (event, context) => {
     return await api.run(event, context);
-  },
-  saveDropboxHandler
+  }
 };
