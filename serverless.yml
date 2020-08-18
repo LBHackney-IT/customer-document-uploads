@@ -31,6 +31,8 @@ provider:
     stage: ${self:provider.stage}
     EVIDENCE_STORE_URL: ${self:custom.evidenceStoreUrls.${self:provider.stage}}
     EVIDENCE_STORE_TOKEN: ${ssm:/customer-document-uploads/evidence-store-token~true}
+    GOV_NOTIFY_API_KEY: ${ssm:/customer-document-uploads/${self:provider.stage}-govnotify-api-key~true}
+    GOV_NOTIFY_TEMPLATE_ID: ${ssm:/customer-document-uploads/govnotify-template-id}
 
 custom:
   dynamodb:

@@ -13,7 +13,8 @@ const {
   createSessionToken,
   templates,
   authorize,
-  updateArchiveStatus
+  updateArchiveStatus,
+  sendNotification
 } = require('./lib/Dependencies');
 const querystring = require('querystring');
 const api = require('lambda-api')();
@@ -231,6 +232,10 @@ const saveDropboxHandler = async event => {
 
     const { dropboxId } = session;
     await saveDropbox(dropboxId, querystring.parse(event.body));
+
+    await sendNotification({
+      dropboxId
+    });
 
     return {
       statusCode: 302,
