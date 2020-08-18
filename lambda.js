@@ -95,7 +95,7 @@ api.get('/dropboxes/new', async (req, res) => {
 
   res.redirect(
     `/dropboxes/${dropbox.id}${
-    req.query.requestId ? `?requestId=${req.query.requestId}` : ''
+      req.query.requestId ? `?requestId=${req.query.requestId}` : ''
     }`
   );
 });
@@ -225,9 +225,12 @@ api.post('/dropboxes/:dropboxId', async (req, res) => {
   }
 
   const { dropboxId } = session;
+  console.log(`Saving dropbox: ${dropboxId}`);
   await saveDropbox(dropboxId, req.body);
 
+  console.log(`Sending notification for dropbox: ${dropboxId}`);
   await sendNotification({ dropboxId });
+
   return res.redirect(`/dropboxes/${dropboxId}`);
 });
 
