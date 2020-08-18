@@ -62,19 +62,6 @@ package:
     - ./**
 
 functions:
-  saveDropbox:
-    handler: lambda.saveDropboxHandler
-    package:
-      include:
-        - lambda.js
-        - lib/**
-        - static/**
-        - templates/**
-        - node_modules/**
-    events:
-      - http:
-          path: "/dropboxes/{dropboxId}"
-          method: POST
   app:
     handler: lambda.appHandler
     package:
