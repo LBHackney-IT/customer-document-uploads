@@ -55,12 +55,17 @@ jobs:
       - attach_workspace:
           at: ~/repo
       - run:
+          name: Install serverless
+          command: sudo npm i -g serverless
+      - run:
+          name: Npm prune
+          command: npm prune --production
+      - run:
           name: Set AWS credentials
-          command: |
-            ./node_modules/serverless/bin/serverless config credentials --provider aws --key ${AWS_ACCESS_KEY_ID} --secret ${AWS_SECRET_ACCESS_KEY} --profile docuploads
+          command: sls --provider aws --key ${AWS_ACCESS_KEY_ID} --secret ${AWS_SECRET_ACCESS_KEY} --profile docuploads
       - run:
           name: Deploy application
-          command: ./node_modules/serverless/bin/serverless deploy -s << parameters.stage_name >>
+          command: sls deploy -s << parameters.stage_name >>
 
 workflows:
   version: 2

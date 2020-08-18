@@ -19,6 +19,8 @@ const {
 const querystring = require('querystring');
 const api = require('lambda-api')();
 const Sentry = require('@sentry/node');
+const fs = require('fs');
+var mime = require('mime-types');
 
 if (process.env.stage === 'production') {
   Sentry.init({
@@ -33,27 +35,20 @@ if (process.env.stage === 'production') {
   });
 }
 
-api.get('/css/:filename', async (req, res) => {
-  res.sendFile(req.params.filename, {
-    root: 'static/css/'
-  });
-});
-
-api.get('/img/:filename', async (req, res) => {
-  res.sendFile(req.params.filename, {
-    root: 'static/img/'
-  });
-});
-
-api.get('/js/:filename', async (req, res) => {
-  res.sendFile(req.params.filename, {
-    root: 'static/js/'
-  });
+api.get('/assets/:folder/:filename', async (req, res) => {
+  const filePath = `${__dirname}/static/${req.params.folder}/${req.params.filename}`;
+  const contentType = mime.lookup(filePath);
+  const data = fs.readFileSync(filePath);
+  res.header('Content-Type', contentType).send(data.toString());
 });
 
 api.use(async (req, res, next) => {
   console.log(`REQUEST: { method: ${req.method}, path: ${req.path} }`);
   next();
+});
+
+api.get('/', async (req, res) => {
+  res.redirect('/dropboxes/new');
 });
 
 api.get('/login', async (req, res) => {
@@ -84,10 +79,9 @@ api.get('/dropboxes', async (req, res) => {
 });
 
 api.get('/dropboxes/new', async (req, res) => {
-  if (authorize(req)) {
-    return res.redirect('/dropboxes');
-  }
+  if (authorize(req)) return res.redirect('/dropboxes');
 
+  console.log(`/dropboxes/new requestId: ${req.query.requestId}`);
   if (!req.query.requestId) {
     const session = getSession(req.headers);
     if (session && session.dropboxId) {
@@ -129,6 +123,7 @@ api.get('/dropboxes/:id', async (req, res) => {
   }
 
   let metadata = {};
+  console.log(`/dropboxes/${dropboxId} requestId: ${req.query.requestId}`);
   if (req.query.requestId) {
     const request = await getDocumentRequest(req.query.requestId);
     if (request) metadata = request.metadata;
@@ -207,10 +202,15 @@ api.post('/requests', async (req, res) => {
   if (!authorize(req)) return res.sendStatus(403);
   if (!req.body.metadata) return res.sendStatus(400);
   const docRequest = await createDocumentRequest(req.body.metadata);
-  res.send({ requestId: docRequest.id });
+  res
+    .header('Access-Control-Allow-Origin', '*')
+    .header('Access-Control-Allow-Credentials', true)
+    .status(201)
+    .json({ requestId: docRequest.id });
 });
 
 api.get('/requests/:requestId', async (req, res) => {
+  if (authorize(req)) return res.redirect('/dropboxes');
   const request = await getDocumentRequest(req.params.requestId);
   if (!request) return res.sendStatus(404);
   if (request.dropboxId) return res.redirect(`/dropboxes/${request.dropboxId}`);
@@ -249,7 +249,7 @@ const saveDropboxHandler = async event => {
 };
 
 module.exports = {
-  handler: async (event, context) => {
+  appHandler: async (event, context) => {
     return await api.run(event, context);
   },
   saveDropboxHandler
