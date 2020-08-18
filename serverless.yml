@@ -18,14 +18,12 @@ provider:
         - s3:GetObject
         - s3:DeleteObject
         - s3:ListBucket
-      Resource: '*'
+      Resource: "*"
   environment:
-    DROPBOXES_TABLE: '${self:service}-${self:provider.stage}-dropboxes'
-    REQUESTS_TABLE: '${self:service}-${self:provider.stage}-requests'
-    UPLOADS_BUCKET: '${self:service}-${self:provider.stage}-uploads'
+    DROPBOXES_TABLE: "${self:service}-${self:provider.stage}-dropboxes"
+    REQUESTS_TABLE: "${self:service}-${self:provider.stage}-requests"
     SENTRY_DSN: ${ssm:/customer-document-uploads/SENTRY_DSN}
     URL_PREFIX: ${self:custom.endpoints.${self:provider.stage}}
-    MAX_UPLOAD_BYTES: 20_971_520
     jwtsecret: ${ssm:/common/hackney-jwt-secret}
     CUSTOMER_TOKEN_SECRET: ${ssm:/common/customer-jwt-secret~true}
     stage: ${self:provider.stage}
@@ -75,7 +73,7 @@ functions:
         - node_modules/**
     events:
       - http:
-          path: '/dropboxes/{dropboxId}'
+          path: "/dropboxes/{dropboxId}"
           method: POST
   app:
     handler: lambda.appHandler
@@ -115,7 +113,7 @@ resources:
             - ServerSideEncryptionByDefault:
                 SSEAlgorithm: AES256
     UploadsDynamoDbTable:
-      Type: 'AWS::DynamoDB::Table'
+      Type: "AWS::DynamoDB::Table"
       DeletionPolicy: Retain
       Properties:
         AttributeDefinitions:
@@ -132,7 +130,7 @@ resources:
           StreamViewType: NEW_AND_OLD_IMAGES
         TableName: ${self:provider.environment.DROPBOXES_TABLE}
     RequestsDynamoDbTable:
-      Type: 'AWS::DynamoDB::Table'
+      Type: "AWS::DynamoDB::Table"
       DeletionPolicy: Retain
       Properties:
         AttributeDefinitions:
