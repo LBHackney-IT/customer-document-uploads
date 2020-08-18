@@ -16,7 +16,6 @@ const {
   updateArchiveStatus,
   sendNotification
 } = require('./lib/Dependencies');
-const querystring = require('querystring');
 const api = require('lambda-api')();
 const Sentry = require('@sentry/node');
 const fs = require('fs');
