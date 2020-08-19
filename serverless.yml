@@ -14,10 +14,6 @@ provider:
         - dynamodb:GetItem
         - dynamodb:PutItem
         - dynamodb:UpdateItem
-        - s3:PutObject
-        - s3:GetObject
-        - s3:DeleteObject
-        - s3:ListBucket
       Resource: "*"
   environment:
     DROPBOXES_TABLE: "${self:service}-${self:provider.stage}-dropboxes"
@@ -86,19 +82,6 @@ functions:
 
 resources:
   Resources:
-    UploadsBucket:
-      Type: AWS::S3::Bucket
-      Properties:
-        BucketName: ${self:provider.environment.UPLOADS_BUCKET}
-        PublicAccessBlockConfiguration:
-          BlockPublicAcls: true
-          BlockPublicPolicy: true
-          IgnorePublicAcls: true
-          RestrictPublicBuckets: true
-        BucketEncryption:
-          ServerSideEncryptionConfiguration:
-            - ServerSideEncryptionByDefault:
-                SSEAlgorithm: AES256
     UploadsDynamoDbTable:
       Type: "AWS::DynamoDB::Table"
       DeletionPolicy: Retain
