@@ -1,3 +1,4 @@
+process.env.GOV_NOTIFY_API_KEY = 'key';
 jest.mock('./lib/Dependencies');
 const {
   authorize,
