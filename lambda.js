@@ -88,21 +88,16 @@ api.get('/dropboxes/new', async (req, res) => {
     }
   }
 
-  const dropbox = await createEmptyDropbox();
+  const dropbox = await createEmptyDropbox(req.query.requestId);
   res.cookie('customerToken', createSessionToken(dropbox.id), {
     maxAge: 86400 * 30 * 1000
   });
 
-  res.redirect(
-    `/dropboxes/${dropbox.id}${
-      req.query.requestId ? `?requestId=${req.query.requestId}` : ''
-    }`
-  );
+  res.redirect(`/dropboxes/${dropbox.id}`);
 });
 
 api.get('/dropboxes/:id', async (req, res) => {
   const session = getSession(req.headers);
-
   if (!session || (session && session.dropboxId !== req.params.id)) {
     return res.redirect('/dropboxes/new');
   }
@@ -122,8 +117,7 @@ api.get('/dropboxes/:id', async (req, res) => {
   }
 
   let metadata = {};
-  console.log(`/dropboxes/${dropboxId} requestId: ${req.query.requestId}`);
-  if (req.query.requestId) {
+  if (dropbox.requestId) {
     const request = await getDocumentRequest(req.query.requestId);
     if (request) metadata = request.metadata;
     if (!request.dropboxId) {
