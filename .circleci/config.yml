@@ -28,10 +28,6 @@ jobs:
 
       - run:
           name: Run unit tests
-          environment:
-            GOV_NOTIFY_TEMPLATE_ID: x
-            GOV_NOTIFY_API_KEY: x
-            URL_PREFIX: localhost:3000
           command: npm run unit-test -- --ci
 
       - run:
