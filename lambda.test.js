@@ -4,6 +4,7 @@ const {
   authorize,
   createDocumentRequest,
   getDropbox,
+  getDropboxes,
   getDocumentRequest,
   getEvidenceStoreUrl,
   getSession,
@@ -33,18 +34,60 @@ const evt = (method, path, body, query) => {
 describe('handler routes', () => {
   const handler = require('./lambda').appHandler;
 
-  describe('GET /login', () => {
-    it('shows the login page if not logged in', async () => {
-      await handler(evt('GET', '/login'), {});
-      expect(templates.loginTemplate).toHaveBeenCalled();
+  describe('GET /', () => {
+    it('redirects to new dropbox', async () => {
+      const res = await handler(evt('GET', '/'));
+      expect(res.statusCode).toBe(302);
+      expect(res.headers.location).toBe('/dropboxes/new');
     });
   });
 
-  describe('GET /logout', () => {});
+  describe('GET /login', () => {
+    it('shows the login page if not logged in', async () => {
+      authorize.mockImplementationOnce(() => false);
+      await handler(evt('GET', '/login'));
+      expect(templates.loginTemplate).toHaveBeenCalled();
+    });
 
-  describe('GET /restart', () => {});
+    it('redirects to the dropboxes page if logged in', async () => {
+      authorize.mockImplementationOnce(() => true);
+      const res = await handler(evt('GET', '/login'));
+      expect(res.statusCode).toBe(302);
+      expect(res.headers.location).toBe('/dropboxes');
+    });
+  });
 
-  describe('GET /dropboxes', () => {});
+  describe('GET /logout', () => {
+    it('redirects to login', async () => {
+      const res = await handler(evt('GET', '/logout'));
+      expect(res.statusCode).toBe(302);
+      expect(res.headers.location).toBe('/login');
+    });
+  });
+
+  describe('GET /restart', () => {
+    it('redirects to new dropbox', async () => {
+      const res = await handler(evt('GET', '/restart'));
+      expect(res.statusCode).toBe(302);
+      expect(res.headers.location).toBe('/dropboxes/new');
+    });
+  });
+
+  describe('GET /dropboxes', () => {
+    it('redirects to login if not logged in', async () => {
+      authorize.mockImplementationOnce(() => false);
+      const res = await handler(evt('GET', '/dropboxes'));
+      expect(res.statusCode).toBe(302);
+      expect(res.headers.location).toBe('/login');
+    });
+
+    it('shows the dropboxes', async () => {
+      authorize.mockImplementationOnce(() => true);
+      await handler(evt('GET', '/dropboxes'), {});
+      expect(getDropboxes).toHaveBeenCalledWith({ submitted: true });
+      expect(templates.staffDropboxListTemplate).toHaveBeenCalled();
+    });
+  });
 
   describe('GET /dropboxes/new', () => {});
 
@@ -91,7 +134,30 @@ describe('handler routes', () => {
     });
   });
 
-  describe('GET /dropboxes/:id/view', () => {});
+  describe('GET /dropboxes/:id/view', () => {
+    it('redirects to login if not logged in', async () => {
+      authorize.mockImplementationOnce(() => false);
+
+      const res = await handler(evt('GET', '/dropboxes/1/view'));
+
+      expect(res.statusCode).toBe(302);
+      expect(res.headers.location).toBe('/login');
+    });
+
+    it('shows dropbox', async () => {
+      const dropbox = { hello: 'hello' };
+      authorize.mockImplementationOnce(() => true);
+      getDropbox.mockImplementationOnce(() => dropbox);
+
+      await handler(evt('GET', '/dropboxes/1/view'));
+
+      expect(templates.readonlyDropboxTemplate).toHaveBeenCalledWith({
+        dropbox,
+        dropboxId: '1',
+        isStaff: true
+      });
+    });
+  });
 
   describe('GET /dropboxes/:dropboxId/files/:fileId', () => {});
 

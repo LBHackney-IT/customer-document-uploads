@@ -5,41 +5,42 @@
   <p>Upload documents one at a time, and describe what each one is.
   </p>
   {{#if dropbox.hasUploads }}
-  <h3>Your uploaded Documents:</h3>
-  <ul id="uploads">
-    {{#each dropbox.uploads }}
-    <li>
-      <div class="container">
-        <div class="row">
-          <div class="col-xs-1 col-sm-1 col-md-1 col-lg-1 col-xl-1">
-            {{inc @index}}.
+    <h3>Your uploaded Documents:</h3>
+    <ul id="uploads">
+      {{#each dropbox.uploads }}
+        <li>
+          <div class="container">
+            <div class="row">
+              <div class="col-xs-1 col-sm-1 col-md-1 col-lg-1 col-xl-1">
+                {{inc @index}}.
+              </div>
+              <div class="col-xs-8 col-sm-8 col-md-9 col-lg-9 col-xl-9">
+                <a href="/dropboxes/{{../dropboxId}}/files/{{this.id}}" target="_blank">{{this.filename}}</a>
+                {{#if this.description }} - {{this.description}}{{/if }}
+              </div>
+              <div>
+                <form method="POST" class="delete-file" action="/dropboxes/{{ ../dropboxId }}/files/{{ this.id }}">
+                  <input type="hidden" name="_method" value="DELETE" />
+                  <button class="btn btn-danger">Delete</button>
+                </form>
+              </div>
+            </div>
           </div>
-          <div class="col-xs-8 col-sm-8 col-md-9 col-lg-9 col-xl-9">
-            <a href="/dropboxes/{{../dropboxId}}/files/{{this.id}}" target="_blank">{{this.filename}}</a>
-            {{#if this.description }} - {{this.description}}{{/if }}
-          </div>
-          <div>
-            <form method="POST" class="delete-file" action="/dropboxes/{{ ../dropboxId }}/files/{{ this.id }}">
-              <input type="hidden" name="_method" value="DELETE" />
-              <button class="btn btn-danger">Delete</button>
-            </form>
-          </div>
-        </div>
-      </div>
-    </li>
-    {{/each}}
-  </ul>
+        </li>
+      {{/each}}
+    </ul>
   {{/if }}
   <form id="upload" action="{{ secureUploadUrl }}" method="POST" enctype="multipart/form-data">
     <div class="form-group">
       {{#each secureUploadFields}}
-      <input type="hidden" name="{{@key}}" value="{{this}}" />
+        <input type="hidden" name="{{@key}}" value="{{this}}" />
       {{/each}}
       <input type="hidden" name="key" value="{{secureDocumentId}}/${filename}" />
       <input type="hidden" name="X-Amz-Server-Side-Encryption" value="AES256" />
       <label for="x-amz-meta-description">File description</label>
       <input type="text" class="form-control" id="x-amz-meta-description" name="x-amz-meta-description"
         placeholder='Explain what the document is, eg. "passport scan"' required />
+      <input type="hidden" name="Content-Type" id="content-type" />
       <label for="file">Select file</label>
       <input type="file" class="form-control" id="file" name="file" required />
     </div>
@@ -47,76 +48,77 @@
       <button type="submit" id="uploadFile" class="btn btn-block btn-lg btn-primary">Upload Document</button>
     </div>
   </form>
+  <script type="text/javascript" src="/assets/js/setContentType.js"></script>
 </section>
 {{#if dropbox.hasUploads }}
-<section>
-  <h2>2. Add your details:</h2>
-  <p>
-    Please fill in as much information as possible so we can identify you. When you are done, click "Submit Documents"
-    to send the documents to us.
-  </p>
-  <form action="" method="POST" onsubmit="return validateIdentification();">
-    <div class="form-group">
-      <label for="customerName">Your name</label>
-      <input type="text" class="form-control" id="customerName" name="customerName" value="{{ dropbox.customer.name }}"
-        required />
-    </div>
-    <div class="form-group">
-      <label for="customerEmail">Email</label>
-      <input type="text" class="form-control" id="customerEmail" name="customerEmail"
-        value="{{ dropbox.customer.email }}" />
-    </div>
-    <div class="form-group">
-      <label for="customerPhone">Phone number</label>
-      <input type="text" class="form-control" id="customerPhone" name="customerPhone"
-        value="{{ dropbox.customer.phone }}" />
-    </div>
-    <p class='top-border'>
-      Please fill out one of the following so we can identify you.
+  <section>
+    <h2>2. Add your details:</h2>
+    <p>
+      Please fill in as much information as possible so we can identify you. When you are done, click "Submit Documents"
+      to send the documents to us.
     </p>
-    <div class="identifiable-fields">
+    <form action="" method="POST" onsubmit="return validateIdentification();">
       <div class="form-group">
-        <label for="customerDob">Date of birth</label>
-        <input type="date" class="form-control" id="customerDob" name="customerDob"
-          value="{{ dropbox.customer.dob }}" />
-      </div>
-      <div class="form-group">
-        <label for="customerReference">Benefits claim reference number</label>
-        <input type="text" class="form-control" id="customerReference" name="customerReference"
-          value="{{ dropbox.customer.reference }}" />
+        <label for="customerName">Your name</label>
+        <input type="text" class="form-control" id="customerName" name="customerName"
+          value="{{ dropbox.customer.name }}" required />
       </div>
       <div class="form-group">
-        <label for="customerNationalInsurance">National insurance number</label>
-        <input type="text" class="form-control" id="customerNationalInsurance" name="customerNationalInsurance"
-          value="{{ dropbox.customer.nationalInsurance }}" />
+        <label for="customerEmail">Email</label>
+        <input type="text" class="form-control" id="customerEmail" name="customerEmail"
+          value="{{ dropbox.customer.email }}" />
       </div>
-      <div class="form-group has-error visually-hidden" id='identifiable-fields-warning'>
-        <p>Please fill out one of the above</p>
+      <div class="form-group">
+        <label for="customerPhone">Phone number</label>
+        <input type="text" class="form-control" id="customerPhone" name="customerPhone"
+          value="{{ dropbox.customer.phone }}" />
       </div>
-    </div>
-    <div class="form-group top-border">
-      <label for="description">Why are you uploading these documents?</label>
-      <textarea class="form-control" id="description" name="description" rows="3"
-        placeholder='Give a reason for uploading the documents, eg. "to apply for change of circumstance"'
-        required>{{ dropbox.description }}</textarea>
-    </div>
-    <div class="form-group">
-      <button type="submit" id="submitDropbox" class="btn btn-block btn-lg btn-primary">Submit Documents</button>
-    </div>
-  </form>
-  <script type="text/javascript">
-    function validateIdentification() {
-      if (document.querySelector('#customerDob').value !== ''
-        || document.querySelector('#customerReference').value !== ''
-        || document.querySelector('#customerNationalInsurance').value !== '') {
-        return true;
-      } else {
-        document.querySelector('#identifiable-fields-warning').classList.remove('visually-hidden')
-        return false;
+      <p class='top-border'>
+        Please fill out one of the following so we can identify you.
+      </p>
+      <div class="identifiable-fields">
+        <div class="form-group">
+          <label for="customerDob">Date of birth</label>
+          <input type="date" class="form-control" id="customerDob" name="customerDob"
+            value="{{ dropbox.customer.dob }}" />
+        </div>
+        <div class="form-group">
+          <label for="customerReference">Benefits claim reference number</label>
+          <input type="text" class="form-control" id="customerReference" name="customerReference"
+            value="{{ dropbox.customer.reference }}" />
+        </div>
+        <div class="form-group">
+          <label for="customerNationalInsurance">National insurance number</label>
+          <input type="text" class="form-control" id="customerNationalInsurance" name="customerNationalInsurance"
+            value="{{ dropbox.customer.nationalInsurance }}" />
+        </div>
+        <div class="form-group has-error visually-hidden" id='identifiable-fields-warning'>
+          <p>Please fill out one of the above</p>
+        </div>
+      </div>
+      <div class="form-group top-border">
+        <label for="description">Why are you uploading these documents?</label>
+        <textarea class="form-control" id="description" name="description" rows="3"
+          placeholder='Give a reason for uploading the documents, eg. "to apply for change of circumstance"'
+          required>{{ dropbox.description }}</textarea>
+      </div>
+      <div class="form-group">
+        <button type="submit" id="submitDropbox" class="btn btn-block btn-lg btn-primary">Submit Documents</button>
+      </div>
+    </form>
+    <script type="text/javascript">
+      function validateIdentification() {
+        if (document.querySelector('#customerDob').value !== ''
+          || document.querySelector('#customerReference').value !== ''
+          || document.querySelector('#customerNationalInsurance').value !== '') {
+          return true;
+        } else {
+          document.querySelector('#identifiable-fields-warning').classList.remove('visually-hidden')
+          return false;
+        }
       }
-    }
-  </script>
-</section>
+    </script>
+  </section>
 {{/if }}
 <script type="text/javascript">
   (function () {
