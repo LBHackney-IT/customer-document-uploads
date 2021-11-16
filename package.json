@@ -31,7 +31,7 @@
   },
   "homepage": "https://github.com/LBHackney-IT/customer-document-uploads#readme",
   "devDependencies": {
-    "aws-sdk": "^2.650.0",
+    "aws-sdk": "^2.814.0",
     "cypress": "^4.11.0",
     "cypress-file-upload": "^4.0.4",
     "dynamodb-admin": "^4.0.0",
